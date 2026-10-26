@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · OakCraft Report Studio</title>
+<meta name="description" content="Which files to upload, how statuses are read, what every metric means, and how to deploy OakCraft Report Studio on GitHub Pages.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23234B3E'/%3E%3Cpath d='M9 22V10h4.2c3.3 0 5.3 2.3 5.3 6s-2 6-5.3 6z' fill='none' stroke='%23E8C595' stroke-width='2.4'/%3E%3Ccircle cx='22.5' cy='16' r='3.2' fill='%23E8C595'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F7F4; --surface:#FFFFFF; --sunk:#EEF1EC; --ink:#1D2421; --ink-2:#4E5A55; --ink-3:#7A857F;
+  --line:#DCE1DC; --forest:#234B3E; --forest-2:#2F6B57; --forest-tint:#E3EEE8; --on-forest:#F3F7F4;
+  --oak:#B8864B; --oak-soft:#F4E9DA; --oak-ink:#7A5426; --warn:#FBEFD3;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --ui:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111714; --surface:#18201C; --sunk:#141B17; --ink:#E5ECE8; --ink-2:#AAB6AF; --ink-3:#7F8C85;
+    --line:#2A3530; --forest:#5FB394; --forest-2:#7CC6A9; --forest-tint:#1D2D26; --on-forest:#0E1411;
+    --oak:#D6A56A; --oak-soft:#2B241B; --oak-ink:#E8C595; --warn:#33291A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111714; --surface:#18201C; --sunk:#141B17; --ink:#E5ECE8; --ink-2:#AAB6AF; --ink-3:#7F8C85;
+  --line:#2A3530; --forest:#5FB394; --forest-2:#7CC6A9; --forest-tint:#1D2D26; --on-forest:#0E1411;
+  --oak:#D6A56A; --oak-soft:#2B241B; --oak-ink:#E8C595; --warn:#33291A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.65 var(--ui);-webkit-font-smoothing:antialiased}
+a{color:var(--forest-2)}
+:focus-visible{outline:2px solid var(--oak);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);font-weight:650;letter-spacing:-.01em;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,4vw,42px)}
+h2{font-size:24px;margin:56px 0 12px;scroll-margin-top:80px}
+h3{font-size:17px;margin:28px 0 6px}
+p,ul,ol{margin:0 0 14px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--sunk);border:1px solid var(--line);padding:1px 6px;border-radius:5px}
+pre{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:14px;line-height:1.5;margin:0 0 16px}
+pre code{background:none;border:0;padding:0}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;padding:10px 20px;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand svg{width:30px;height:30px}
+.brand b{font-family:var(--display);font-size:17px;font-weight:650}
+.brand span{color:var(--ink-3);font-weight:500}
+.top .sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;background:var(--forest);color:var(--on-forest);text-decoration:none;font-weight:600;font-size:14px}
+.btn:hover{background:var(--forest-2)}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;max-width:1120px;margin:0 auto;padding:40px 24px 96px}
+.toc{position:sticky;top:84px;align-self:start;font-size:14px}
+.toc p{color:var(--ink-3);margin-bottom:8px}
+.toc a{display:block;padding:5px 10px;border-left:2px solid var(--line);color:var(--ink-2);text-decoration:none}
+.toc a:hover{color:var(--ink);border-color:var(--oak)}
+article{max-width:74ch}
+.lede{font-size:18px;color:var(--ink-2);margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:6px 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--sunk);font-weight:600;color:var(--ink-2);font-size:13.5px}
+tr:last-child td{border-bottom:0}
+.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:18px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:14px}
+.steps li::before{content:counter(s);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:650;background:var(--oak-soft);color:var(--oak-ink)}
+.steps li > div > b{display:block}
+.note{padding:14px 16px;border-radius:10px;background:var(--forest-tint);margin:0 0 18px}
+.note.warn{background:var(--warn)}
+dl{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:10px 20px;margin:0 0 18px}
+dt{font-weight:600}
+dd{margin:0;color:var(--ink-2)}
+details{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 16px;margin-bottom:10px}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:8px}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-3)}
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr;gap:16px;padding:24px 16px 72px}
+  .toc{position:static;display:flex;gap:6px;flex-wrap:wrap}
+  .toc p{display:none}
+  .toc a{border:1px solid var(--line);border-radius:99px;padding:4px 10px}
+  dl{grid-template-columns:1fr;gap:2px 0}
+  dd{margin-bottom:10px}
+  .brand span{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#234B3E"/><path d="M9 22V10h4.2c3.3 0 5.3 2.3 5.3 6s-2 6-5.3 6z" fill="none" stroke="#E8C595" stroke-width="2.4"/><circle cx="22.5" cy="16" r="3.2" fill="#E8C595"/></svg>
+    <b>OakCraft <span>Report Studio</span></b>
+  </a>
+  <span class="sp"></span>
+  <a class="btn" href="./">Open the app</a>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="On this page">
+    <p>On this page</p>
+    <a href="#use">Weekly use</a>
+    <a href="#files">Files it reads</a>
+    <a href="#status">How statuses are read</a>
+    <a href="#metrics">What each number means</a>
+    <a href="#excel">The Excel report</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#deploy">Deploy on GitHub</a>
+    <a href="#server">Server mode</a>
+    <a href="#faq">Troubleshooting</a>
+  </nav>
+
+  <article>
+    <h1>How OakCraft Report Studio works</h1>
+    <p class="lede">Upload the week's lead exports and the studio builds the master lead and pipeline report: a one-sheet Excel file, a dashboard you can sort and filter, and a follow-up list for the sales team.</p>
+
+    <h2 id="use">Weekly use</h2>
+    <ol class="steps">
+      <li><div><b>Export the four reports</b>Meta leads, IndiaMART, JustDial enquiries and the Qualified pipeline file, straight from the CRM. Do not edit them.</div></li>
+      <li><div><b>Drop them on the page together</b>Each file is recognised from its columns and lands in its slot. A file that lands in "not recognised" is not one of the four exports.</div></li>
+      <li><div><b>Check the report date</b>It defaults to today. Waiting time on qualified leads is counted from this date.</div></li>
+      <li><div><b>Generate the report</b>The dashboard opens. Use <i>Download Excel</i> for the master file and <i>Export filtered list</i> on the Follow-ups page to send each salesperson their own list.</div></li>
+    </ol>
+    <p class="note">Any subset works. With only the lead files you get lead handling; with only the Qualified file you get the after-qualification sections. The Data checks page says which files were missing.</p>
+
+    <h2 id="files">Files it reads</h2>
+    <p>Columns are found by their header name first. If a header was renamed, the column letter below is used as a fallback.</p>
+    <table>
+      <thead><tr><th>Report</th><th>Salesperson</th><th>Status</th><th>Also used</th></tr></thead>
+      <tbody>
+        <tr><td><b>Meta leads</b><br><code>meta_leads_*.xlsx</code></td><td>Column H <code>assigned_to</code></td><td>Column G <code>lead_status</code></td><td>enquiry_id, created_time_ist, platform (fb / ig), full_name, phone_number</td></tr>
+        <tr><td><b>IndiaMART</b><br><code>OakCraft-indiamart-*.xlsx</code></td><td>Column L <code>Assigned To</code></td><td>Column K <code>Status</code></td><td>Query Time, Buyer, Mobile, Enquiry No</td></tr>
+        <tr><td><b>JustDial</b><br><code>OakCraft-enquiries-*.xlsx</code></td><td>Column G <code>Salesperson</code></td><td>Column P <code>Qualification Status</code></td><td>Enquiry ID, Date, Customer, Stage (for the conflict check)</td></tr>
+        <tr><td><b>Qualified pipeline</b><br><code>OakCraft-qualified-*.xlsx</code></td><td>Column K <code>Salesperson</code></td><td>Column L <code>Status</code></td><td>Source (col A), Record Id, Qualified On, Date, Name, Contact, Customer Type, Purchase Qty, Value</td></tr>
+      </tbody>
+    </table>
+    <p>Salesperson names are cleaned to Title Case, so <code>UJALA RAJPUT</code> and <code>Ujala Rajput</code> count as one person. A blank salesperson becomes <b>Unassigned</b>. In the Qualified file, source <code>Enquiry</code> is reported as JustDial.</p>
+
+    <h2 id="status">How statuses are read</h2>
+    <h3>Lead files (Meta, IndiaMART, JustDial)</h3>
+    <table>
+      <thead><tr><th>Shown as</th><th>Statuses in the export</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><b>Qualified</b></td><td>QUALIFIED, Qualified, Quotation Sent, Won</td><td>The lead is genuine and worth pursuing.</td></tr>
+        <tr><td><b>Not qualified</b></td><td>NOT_QUALIFIED, Not Qualified, Lost, Junk, Fake</td><td>Called and rejected.</td></tr>
+        <tr><td><b>Call not pick</b></td><td>CALL_NOT_PICK, Call Not Pick, Busy, Switched off</td><td>Attempted, not reached yet.</td></tr>
+        <tr><td><b>Not worked</b></td><td>CREATED, New, blank</td><td>Received but nobody has updated it.</td></tr>
+      </tbody>
+    </table>
+    <p>Anything else is shown as <b>Other</b> and listed on the Data checks page, so a new CRM status never disappears silently.</p>
+    <h3>Qualified pipeline file</h3>
+    <dl>
+      <dt>No action</dt><dd>Status is still <code>Qualified</code>: nothing has happened since the lead was qualified.</dd>
+      <dt>Won</dt><dd>The lead was cracked.</dd>
+      <dt>Lost</dt><dd>The lead turned out not to be useful.</dd>
+      <dt>Anything else</dt><dd>For example <code>Quotation Sent</code>. Counted as work in progress and shown as its own column.</dd>
+    </dl>
+
+    <h2 id="metrics">What each number means</h2>
+    <dl>
+      <dt>Lead → qualified</dt><dd>Qualified ÷ all leads received.</dd>
+      <dt>Conv. on worked</dt><dd>Qualified ÷ (leads − not worked). It shows the quality of the calls actually made, so a salesperson with many untouched leads is not mistaken for a poor closer.</dd>
+      <dt>Worked</dt><dd>Leads with any status other than Created / New.</dd>
+      <dt>Action rate</dt><dd>Qualified leads that moved beyond Qualified (quotation, won, lost) ÷ all qualified leads.</dd>
+      <dt>Win rate</dt><dd>Won ÷ qualified leads in the pipeline.</dd>
+      <dt>Waiting</dt><dd>Days between Qualified On and the report date, for leads with no action.</dd>
+      <dt>Priority</dt><dd>Critical at 5+ days waiting, High at 3–4 days, Normal at 0–2 days.</dd>
+      <dt>Better / worse than team</dt><dd>On the scorecard, each rate is compared with the team total. Unassigned leads are never coloured.</dd>
+    </dl>
+    <p class="note warn">The lead files and the Qualified file are different populations. The Qualified file is the CRM pipeline and can include leads qualified from enquiries older than this week, so the funnel restarts at "Qualified in pipeline".</p>
+
+    <h2 id="excel">The Excel report</h2>
+    <p>One sheet, <b>Lead Report</b>, with sections A to M: headline KPIs, conversion funnel, salesperson scorecard, salesperson × source, source performance with the Facebook / Instagram split, after-qualification work, waiting-time buckets and customer types, six charts, findings with owners, data checks, the priority follow-up list, leads that moved after qualification and unassigned leads.</p>
+    <p>Two more tabs, <b>Data_Leads</b> and <b>Data_Pipeline</b>, hold the cleaned rows. Every number on the report is a live formula over those tabs: correct a status there and the report updates. The yellow cell next to "Report as-of" drives the waiting-time calculations.</p>
+
+    <h2 id="privacy">Privacy</h2>
+    <p>On GitHub Pages the studio has no server. The page downloads a Python runtime (Pyodide) once, and your files are read and analysed inside the browser tab. Nothing is uploaded. Recent reports are stored only in this browser's local storage; use <i>Clear history</i> on the home page to remove them.</p>
+    <p>In server mode, files are sent to the server you run, processed in memory and not written to disk.</p>
+
+    <h2 id="deploy">Deploy on GitHub</h2>
+    <ol class="steps">
+      <li><div><b>Create a repository</b>For example <code>oakcraft-report-studio</code>. Private works too if your GitHub plan allows Pages on private repositories.</div></li>
+      <li><div><b>Push this folder</b><pre><code>git init
+git add .
+git commit -m "OakCraft Report Studio"
+git branch -M main
+git remote add origin https://github.com/&lt;you&gt;/oakcraft-report-studio.git
+git push -u origin main</code></pre></div></li>
+      <li><div><b>Turn on Pages</b>Repository → Settings → Pages → Source: <i>GitHub Actions</i>. The included workflow runs the tests and publishes the site on every push to <code>main</code>.</div></li>
+      <li><div><b>Open the site</b><code>https://&lt;you&gt;.github.io/oakcraft-report-studio/</code>. The first visit takes 10–20 seconds while the Python engine downloads; later visits are faster because the browser caches it.</div></li>
+    </ol>
+    <p>To try it on your own computer without GitHub, run <code>python -m http.server 8000</code> in this folder and open <code>http://localhost:8000</code>. Opening <code>index.html</code> by double-click does not work, because browsers block the engine files on <code>file://</code> pages.</p>
+
+    <h2 id="server">Server mode</h2>
+    <p>For very large exports, or an office intranet without internet access to the Pyodide CDN, run the same app with native Python:</p>
+    <pre><code>pip install -r requirements.txt
+python server/app.py          # http://localhost:8000</code></pre>
+    <p>The page detects the server automatically and the status pill reads "Engine ready · server". The same engine is also available on the command line:</p>
+    <pre><code>python -m engine meta.xlsx indiamart.xlsx enquiries.xlsx qualified.xlsx -o report.xlsx --asof 2026-10-26</code></pre>
+
+    <h2 id="faq">Troubleshooting</h2>
+    <details><summary>"Engine failed to load"</summary><p>The browser could not download the Python runtime from <code>cdn.jsdelivr.net</code> or the Excel library from PyPI. Check the internet connection or office firewall, then reload. If the firewall cannot be changed, use server mode.</p></details>
+    <details><summary>A file lands in "not recognised"</summary><p>It does not have the columns of any of the four exports. Re-export it from the CRM without editing, or check that the header row is the first row of the sheet.</p></details>
+    <details><summary>A salesperson appears twice</summary><p>The name is spelt differently in two exports (for example "Amira Saikh" and "Amira Shaikh"). The Data checks page flags similar names; fix the spelling in the CRM.</p></details>
+    <details><summary>Numbers in the Excel file show as 0 in a preview app</summary><p>The report uses live formulas. Excel, Google Sheets and LibreOffice calculate them on open; some phone previewers do not. Open the file in a spreadsheet app.</p></details>
+    <details><summary>Adding a new status or column</summary><p>Status rules live in <code>engine/loader.py</code> (<code>lead_bucket</code> and <code>pipe_stage</code>), column names in the same file. Run <code>python -m pytest</code> after changing them.</p></details>
+
+    <footer>OakCraft Report Studio · <a href="./">Back to the app</a></footer>
+  </article>
+</div>
+<script>
+try { const t = localStorage.getItem("ocrs.theme"); if (t) document.documentElement.dataset.theme = t; } catch(e) {}
+</script>
+</body>
+</html>

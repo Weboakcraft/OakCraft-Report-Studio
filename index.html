@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OakCraft Report Studio</title>
+<meta name="description" content="Upload Meta, IndiaMART, JustDial and Qualified lead exports and get OakCraft's master lead & pipeline report instantly. Runs in your browser – data never leaves your computer.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23234B3E'/%3E%3Cpath d='M9 22V10h4.2c3.3 0 5.3 2.3 5.3 6s-2 6-5.3 6z' fill='none' stroke='%23E8C595' stroke-width='2.4'/%3E%3Ccircle cx='22.5' cy='16' r='3.2' fill='%23E8C595'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F7F4; --surface:#FFFFFF; --sunk:#EEF1EC; --ink:#1D2421; --ink-2:#4E5A55; --ink-3:#7A857F;
+  --line:#DCE1DC; --line-2:#C9D0CA;
+  --forest:#234B3E; --forest-2:#2F6B57; --forest-tint:#E3EEE8; --on-forest:#F3F7F4;
+  --oak:#B8864B; --oak-soft:#F4E9DA; --oak-ink:#7A5426;
+  --q:#2E8B57; --q-bg:#E2F2E8; --nq:#B5473A; --nq-bg:#F8E4E0; --cnp:#C98A1E; --cnp-bg:#FBEFD6;
+  --pend:#7D8A93; --pend-bg:#ECEFF1; --prog:#3C78B5; --prog-bg:#E3EDF8; --lost:#6B6B6B;
+  --good:#DDF1E4; --bad:#F9E1DD; --warn:#FBEFD3;
+  --shadow:0 1px 0 rgba(29,36,33,.04), 0 8px 24px -16px rgba(29,36,33,.25);
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --ui:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --rail:232px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111714; --surface:#18201C; --sunk:#141B17; --ink:#E5ECE8; --ink-2:#AAB6AF; --ink-3:#7F8C85;
+    --line:#2A3530; --line-2:#36433D;
+    --forest:#5FB394; --forest-2:#7CC6A9; --forest-tint:#1D2D26; --on-forest:#0E1411;
+    --oak:#D6A56A; --oak-soft:#2B241B; --oak-ink:#E8C595;
+    --q:#5CC28A; --q-bg:#183026; --nq:#E07A6C; --nq-bg:#341F1C; --cnp:#E3AE4A; --cnp-bg:#33291A;
+    --pend:#98A4AC; --pend-bg:#232A2E; --prog:#77A8DB; --prog-bg:#1B2633; --lost:#9A9A9A;
+    --good:#183026; --bad:#341F1C; --warn:#33291A;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111714; --surface:#18201C; --sunk:#141B17; --ink:#E5ECE8; --ink-2:#AAB6AF; --ink-3:#7F8C85;
+  --line:#2A3530; --line-2:#36433D;
+  --forest:#5FB394; --forest-2:#7CC6A9; --forest-tint:#1D2D26; --on-forest:#0E1411;
+  --oak:#D6A56A; --oak-soft:#2B241B; --oak-ink:#E8C595;
+  --q:#5CC28A; --q-bg:#183026; --nq:#E07A6C; --nq-bg:#341F1C; --cnp:#E3AE4A; --cnp-bg:#33291A;
+  --pend:#98A4AC; --pend-bg:#232A2E; --prog:#77A8DB; --prog-bg:#1B2633; --lost:#9A9A9A;
+  --good:#183026; --bad:#341F1C; --warn:#33291A;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 30px -18px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--ui);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1}
+h1,h2,h3{font-family:var(--display);font-weight:650;letter-spacing:-.01em;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,4.2vw,46px)}
+h2{font-size:24px}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--forest-2)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--oak);outline-offset:2px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--ink-2)}
+.faint{color:var(--ink-3)}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums}
+
+/* ---------- buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);
+  padding:9px 14px;border-radius:var(--r-s);cursor:pointer;font-weight:600;font-size:14px;line-height:1.2;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--ink-3)}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.primary{background:var(--forest);border-color:var(--forest);color:var(--on-forest)}
+.btn.primary:hover{background:var(--forest-2);border-color:var(--forest-2)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--sunk);color:var(--ink)}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.iconbtn{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r-s);border:1px solid transparent;background:transparent;cursor:pointer;color:var(--ink-2)}
+.iconbtn:hover{background:var(--sunk);color:var(--ink)}
+.iconbtn svg{width:18px;height:18px}
+
+/* ---------- top bar */
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;padding:10px 20px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand svg{width:30px;height:30px}
+.brand b{font-family:var(--display);font-size:17px;font-weight:650;letter-spacing:-.01em}
+.brand span{color:var(--ink-3);font-weight:500}
+.topbar .spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding:5px 10px 5px 8px;border:1px solid var(--line);border-radius:99px;background:var(--surface)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--pend)}
+.pill[data-state="loading"] i{background:var(--cnp);animation:pulse 1.2s ease-in-out infinite}
+.pill[data-state="ready"] i{background:var(--q)}
+.pill[data-state="error"] i{background:var(--nq)}
+@keyframes pulse{50%{opacity:.35}}
+.report-actions{display:none;gap:8px}
+body.has-report .report-actions{display:flex}
+
+/* ---------- upload view */
+.upload{max-width:1120px;margin:0 auto;padding:48px 24px 72px}
+.intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:40px;align-items:end;margin-bottom:28px}
+.intro p{font-size:17px;color:var(--ink-2);max-width:60ch;margin-top:14px}
+.privacy{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--r-m);background:var(--forest-tint);color:var(--ink);font-size:14px}
+.privacy svg{width:20px;height:20px;flex:none;color:var(--forest-2);margin-top:2px}
+
+.bench{position:relative;border-radius:var(--r-l);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:22px;transition:border-color .15s, background .15s}
+.bench.drag{border-color:var(--oak);background:var(--oak-soft)}
+.bench-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.bench-head h2{font-size:20px}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.slot{position:relative;min-height:148px;border-radius:var(--r-m);padding:14px 14px 12px;border:1.5px dashed var(--line-2);background:var(--sunk);display:flex;flex-direction:column;gap:6px;transition:background .2s,border-color .2s}
+.slot .src{display:flex;align-items:center;gap:8px;font-weight:650;font-family:var(--display);font-size:16px}
+.slot .src svg{width:20px;height:20px;color:var(--ink-3)}
+.slot .hint{font-size:12.5px;color:var(--ink-3);word-break:break-all}
+.slot .what{font-size:13px;color:var(--ink-2)}
+.slot .state{margin-top:auto;font-size:13px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.slot.filled{border-style:solid;border-color:var(--forest);background:var(--forest-tint)}
+.slot.filled .src svg{color:var(--forest-2)}
+.slot.filled .state{color:var(--forest-2);font-weight:600}
+.slot.checking{border-color:var(--oak)}
+.slot .file{font-size:13px;color:var(--ink);font-weight:500;word-break:break-all;line-height:1.35}
+.slot .x{position:absolute;top:8px;right:8px}
+.slot.just-filled{animation:seat .5s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes seat{0%{transform:scale(.97)}60%{transform:scale(1.015)}100%{transform:none}}
+
+.dropline{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px;border-radius:var(--r-m);border:1px solid var(--line)}
+.dropline .lead{display:flex;align-items:center;gap:12px}
+.dropline .lead svg{width:28px;height:28px;color:var(--oak)}
+.dropline b{font-weight:600}
+.extra{margin-top:12px;display:grid;gap:8px}
+.extra .row{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:8px 12px;border-radius:var(--r-s);background:var(--nq-bg);color:var(--ink)}
+.extra .row.dup{background:var(--warn)}
+.extra .row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.runbar{margin-top:18px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.field{display:grid;gap:4px;font-size:13px;color:var(--ink-2)}
+.field input,.field select{border:1px solid var(--line-2);background:var(--surface);border-radius:var(--r-s);padding:8px 10px;min-height:38px}
+.runbar .grow{flex:1}
+.runbar .msg{font-size:13.5px;color:var(--ink-2);max-width:48ch}
+.btn.go{padding:12px 20px;font-size:15px}
+
+.below{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;margin-top:40px}
+.howto ol{margin:12px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:14px}
+.howto li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:12px;font-size:14.5px;color:var(--ink-2)}
+.howto li::before{content:counter(s);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:650;color:var(--oak-ink);background:var(--oak-soft)}
+.howto li b{color:var(--ink);font-weight:600;display:block}
+.history h3{margin-bottom:10px}
+.history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.history li button{width:100%;text-align:left;display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-s);cursor:pointer}
+.history li button:hover{border-color:var(--ink-3)}
+.history li small{color:var(--ink-3);font-size:12.5px}
+.history .empty{font-size:14px;color:var(--ink-3);padding:12px;border:1px dashed var(--line-2);border-radius:var(--r-s)}
+
+/* ---------- report view */
+.report{display:none}
+body.has-report .upload{display:none}
+body.has-report .report{display:grid;grid-template-columns:var(--rail) minmax(0,1fr)}
+.rail{position:sticky;top:57px;align-self:start;height:calc(100vh - 57px);padding:22px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;overflow:auto}
+.rail .period{padding:0 10px 14px;margin-bottom:8px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.rail .period b{display:block;font-family:var(--display);font-size:16px;color:var(--ink);font-weight:600}
+.rail button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;padding:9px 10px;border-radius:var(--r-s);cursor:pointer;color:var(--ink-2);font-weight:500}
+.rail button svg{width:18px;height:18px;flex:none}
+.rail button:hover{background:var(--sunk);color:var(--ink)}
+.rail button[aria-current="true"]{background:var(--forest);color:var(--on-forest)}
+.rail button .count{margin-left:auto;font-size:12px;padding:1px 7px;border-radius:99px;background:var(--sunk);color:var(--ink-2)}
+.rail button[aria-current="true"] .count{background:rgba(255,255,255,.18);color:inherit}
+.rail .foot{margin-top:auto;padding:12px 10px 0;font-size:12px;color:var(--ink-3)}
+
+.content{padding:28px 32px 80px;min-width:0}
+.panel{display:none;max-width:1320px}
+.panel.on{display:block}
+.panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.panel-head p{color:var(--ink-2);margin-top:6px;max-width:70ch}
+.block{margin-top:28px}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.block-head p{font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m)}
+.headline{font-family:var(--display);font-size:clamp(20px,2.2vw,26px);font-weight:500;line-height:1.3;max-width:62ch;letter-spacing:-.005em}
+.headline strong{font-weight:650}
+
+/* KPI ledgers */
+.ledgers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}
+.ledger{padding:16px 18px 6px}
+.ledger h3{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ledger h3 i{width:10px;height:10px;border-radius:3px;background:var(--forest)}
+.ledger.pipe h3 i{background:var(--oak)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric{padding:12px 12px 14px 0;border-top:1px solid var(--line)}
+.metric:nth-child(-n+3){border-top:0}
+.metric .v{font-family:var(--display);font-size:28px;font-weight:600;line-height:1.1}
+.metric .l{font-size:13px;color:var(--ink-2);margin-top:2px}
+.metric .s{font-size:12px;color:var(--ink-3)}
+.metric.alert .v{color:var(--nq)}
+
+/* funnel */
+.funnel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.fgroup{padding:16px 18px}
+.fgroup h3{margin-bottom:12px}
+.fstep{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:4px 12px;align-items:center;margin-bottom:4px}
+.fstep .track{display:flex;align-items:center;gap:8px;min-width:0}
+.fstep .bar{height:34px;border-radius:5px;background:var(--forest);display:flex;align-items:center;padding:0 10px;color:var(--on-forest);font-size:13px;font-weight:600;min-width:6px;white-space:nowrap;overflow:hidden;flex:none}
+.fstep .out{font-size:13px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.fgroup.pipe .bar{background:var(--oak);color:var(--on-forest)}
+.fstep .val{font-family:var(--display);font-size:20px;font-weight:600;text-align:right}
+.fgroup .conv{font-size:12px;color:var(--ink-3);padding:2px 0 6px 12px;border-left:2px solid var(--line-2);margin-left:10px}
+.fgroup .conv b{color:var(--ink-2)}
+
+/* charts */
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart{padding:14px 16px 10px}
+.chart h3{font-size:15px;margin-bottom:8px}
+.chart .canvas{position:relative;height:260px}
+.chart.wide{grid-column:1/-1}
+
+/* tables */
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:var(--r-m);background:var(--surface)}
+.tablewrap.tall{max-height:72vh}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:var(--sunk);font-weight:600;color:var(--ink-2);font-size:12.5px;vertical-align:bottom;white-space:normal;min-width:72px;line-height:1.25;z-index:1}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--ink)}
+th[aria-sort="ascending"]::after{content:" ▲";font-size:9px}
+th[aria-sort="descending"]::after{content:" ▼";font-size:9px}
+td.t,th.t{text-align:left}
+td.wrap{white-space:normal;min-width:180px}
+tbody tr:hover td{background:color-mix(in srgb,var(--sunk) 70%,transparent)}
+tr.sub td{background:var(--sunk);font-weight:600}
+tr.total td{background:var(--forest);color:var(--on-forest);font-weight:650;border-bottom:0}
+tr.child td{color:var(--ink-2)}
+tr.child td.t:nth-child(2){padding-left:26px}
+td.good{background:var(--good)}
+td.bad{background:var(--bad)}
+td.zero{color:var(--ink-3)}
+td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--q);vertical-align:middle;margin-right:8px;opacity:.75}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--ink-2)}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag.q{background:var(--q-bg);color:var(--q)} .tag.nq{background:var(--nq-bg);color:var(--nq)}
+.tag.cnp{background:var(--cnp-bg);color:var(--cnp)} .tag.pend{background:var(--pend-bg);color:var(--pend)}
+.tag.won{background:var(--q-bg);color:var(--q)} .tag.lost{background:var(--pend-bg);color:var(--lost)} .tag.prog{background:var(--prog-bg);color:var(--prog)}
+.tag.crit{background:var(--nq-bg);color:var(--nq)} .tag.high{background:var(--cnp-bg);color:var(--cnp)} .tag.norm{background:var(--pend-bg);color:var(--pend)}
+.heat{font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px}
+
+/* filters */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.filters .field input[type="search"]{min-width:240px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line-2);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip b{font-weight:650;margin-left:4px}
+.resultcount{font-size:13px;color:var(--ink-3);margin-left:auto}
+a.tel{color:inherit;text-decoration:none;border-bottom:1px dotted var(--ink-3)}
+
+/* findings */
+.findings{display:grid;gap:10px}
+.finding{display:grid;grid-template-columns:6px minmax(0,1.3fr) minmax(0,1fr) 120px;gap:16px;padding:14px 16px 14px 0;align-items:start;overflow:hidden}
+.finding .sev{align-self:stretch;border-radius:0 3px 3px 0;background:var(--pend)}
+.finding.high .sev{background:var(--nq)} .finding.medium .sev{background:var(--cnp)} .finding.low .sev{background:var(--q)}
+.finding .area{font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.finding .act{font-size:14px;color:var(--ink-2);padding-left:14px;border-left:1px solid var(--line)}
+.finding .act b{display:block;color:var(--ink);font-size:12.5px;margin-bottom:2px}
+.finding .own{font-size:13px;font-weight:600;text-align:right}
+.checks{display:grid;gap:8px}
+.check{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:10px 14px;font-size:14px;align-items:start}
+.check svg{width:18px;height:18px;margin-top:2px}
+.check.ok svg{color:var(--q)} .check.issue svg{color:var(--cnp)} .check.note svg{color:var(--prog)}
+
+/* processing dialog, toast */
+dialog{border:0;border-radius:var(--r-l);padding:0;background:var(--surface);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.45);width:min(440px,92vw)}
+dialog::backdrop{background:rgba(17,23,20,.45);backdrop-filter:blur(2px)}
+.proc{padding:24px 24px 20px}
+.proc h2{font-size:20px;margin-bottom:4px}
+.steps{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.steps li{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink-3)}
+.steps li i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-2);flex:none;display:grid;place-items:center}
+.steps li.doing{color:var(--ink)}
+.steps li.doing i{border-color:var(--oak);border-top-color:transparent;animation:spin .8s linear infinite}
+.steps li.done{color:var(--ink-2)}
+.steps li.done i{border-color:var(--q);background:var(--q)}
+.steps li.done i::after{content:"";width:6px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc .note{margin-top:16px;font-size:12.5px;color:var(--ink-3)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:var(--r-s);font-size:14px;transition:.25s;z-index:60;max-width:90vw}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.toast.err{background:var(--nq);color:#fff}
+
+/* responsive */
+@media (max-width:1080px){
+  .slots{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ledgers,.funnel,.charts{grid-template-columns:1fr}
+  .finding{grid-template-columns:6px 1fr;}
+  .finding .act,.finding .own{grid-column:2;text-align:left;padding-left:0;border-left:0}
+}
+@media (max-width:860px){
+  .intro,.below{grid-template-columns:1fr}
+  body.has-report .report{grid-template-columns:1fr}
+  .rail{position:sticky;top:57px;height:auto;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px 12px;background:var(--paper);z-index:20}
+  .rail .period,.rail .foot{display:none}
+  .rail button{width:auto;white-space:nowrap}
+  .content{padding:20px 16px 64px}
+  .topbar{padding:10px 16px;gap:10px}
+  .brand span,.pill .txt,.report-actions .btn .lbl{display:none}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .metric:nth-child(3){border-top:1px solid var(--line)}
+}
+@media (max-width:560px){
+  body.has-report #engine-pill{display:none}
+  .slots{grid-template-columns:1fr}
+  .upload{padding:28px 16px 56px}
+  .runbar{flex-direction:column;align-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+/* print = full report */
+/* drill-down drawer, deltas */
+.delta{font-size:12px;font-weight:600;margin-top:2px}
+.delta.up{color:var(--q)} .delta.down{color:var(--nq)} .delta.flat{color:var(--ink-3);font-weight:500}
+.compare-note{font-size:13px;color:var(--ink-3);margin-top:10px}
+.namebtn{border:0;background:none;padding:0;font:inherit;font-weight:650;color:inherit;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
+.namebtn:hover{text-decoration-color:var(--oak)}
+.scrim{position:fixed;inset:0;background:rgba(17,23,20,.42);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);background:var(--paper);border-left:1px solid var(--line);z-index:41;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px -30px rgba(0,0,0,.35);visibility:hidden}
+.drawer.on{transform:none;visibility:visible}
+.drawer header{display:flex;align-items:flex-start;gap:12px;padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+.drawer header h2{font-size:26px}
+.drawer header p{font-size:13.5px;color:var(--ink-2);margin-top:4px}
+.drawer .body{overflow-y:auto;overflow-x:hidden;padding:18px 22px 32px;display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start}
+.drawer .body > section{min-width:0}
+.drawer .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+.drawer h3{margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vs{display:grid;gap:6px;font-size:14px}
+.vs div{display:grid;grid-template-columns:1fr 80px 80px;gap:12px;padding:8px 12px;border-radius:6px;background:var(--surface);border:1px solid var(--line);align-items:center}
+.vs div span:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.vs div.head{background:transparent;border-color:transparent;font-size:12.5px;color:var(--ink-3);padding-top:0;padding-bottom:0}
+.vs b.up{color:var(--q)} .vs b.down{color:var(--nq)}
+.drawer .actions{display:flex;gap:8px;flex-wrap:wrap}
+@media print{
+  .drawer,.scrim{display:none!important}
+  .tablewrap.tall{max-height:none}
+  :root{--paper:#fff;--surface:#fff}
+  .topbar,.rail,.upload,.no-print,.filters,.btn{display:none!important}
+  body.has-report .report{display:block}
+  .panel{display:block!important;break-before:page}
+  .panel:first-child{break-before:auto}
+  .content{padding:0}
+  .tablewrap{overflow:visible;border:0}
+  th{position:static}
+  .chart .canvas{height:220px}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-meta" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3 15c0-4 2-8 4.5-8C11 7 13 17 16.5 17 19 17 21 14 21 11.5 21 9 19.8 7 18 7c-3 0-5.5 8-8.5 8C7 15 6 13.5 6 12"/></symbol>
+  <symbol id="i-im" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 9h16l-1.5 11h-13zM8 9V7a4 4 0 0 1 8 0v2"/></symbol>
+  <symbol id="i-jd" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></symbol>
+  <symbol id="i-q" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L7 9m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0-5-5m5 5 5-5M4 20h16"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2M7 14h10v6H7z"/></symbol>
+  <symbol id="i-new" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></g></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></symbol>
+  <symbol id="i-ov" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z"/></symbol>
+  <symbol id="i-team" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.5-3.5 3-5.5 6-5.5s5.5 2 6 5.5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.8c1.7.7 2.7 2.4 3 5.2"/></g></symbol>
+  <symbol id="i-src" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h5l3 6h8M4 18h5l3-6"/><circle cx="20" cy="12" r="1.5"/></g></symbol>
+  <symbol id="i-pipe" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 5h18l-6 7v6l-6 2v-8z"/></symbol>
+  <symbol id="i-call" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></g></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></g></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M9 9h11v11H9zM5 15H4V4h11v1"/></symbol>
+  <symbol id="i-csv" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 3h8l4 4v14H6zM14 3v4h4M9 13h6M9 17h6"/></symbol>
+</svg>
+
+<header class="topbar">
+  <a class="brand" href="./" aria-label="OakCraft Report Studio home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#234B3E"/><path d="M9 22V10h4.2c3.3 0 5.3 2.3 5.3 6s-2 6-5.3 6z" fill="none" stroke="#E8C595" stroke-width="2.4"/><circle cx="22.5" cy="16" r="3.2" fill="#E8C595"/></svg>
+    <b>OakCraft <span>Report Studio</span></b>
+  </a>
+  <span class="spacer"></span>
+  <div class="report-actions">
+    <button class="btn primary" id="dl-xlsx" type="button"><svg><use href="#i-dl"/></svg><span class="lbl">Download Excel</span></button>
+    <button class="btn" id="share" type="button" title="A single HTML file you can email to management"><svg><use href="#i-share"/></svg><span class="lbl">Share snapshot</span></button>
+    <button class="btn" id="do-print" type="button"><svg><use href="#i-print"/></svg><span class="lbl">Print or save PDF</span></button>
+    <button class="btn ghost" id="new-report" type="button"><svg><use href="#i-new"/></svg><span class="lbl">New report</span></button>
+  </div>
+  <span class="pill" id="engine-pill" data-state="loading" role="status" aria-live="polite"><i></i><span class="txt">Starting report engine…</span></span>
+  <a class="iconbtn" href="guide.html" title="How it works" aria-label="How it works"><svg><use href="#i-help"/></svg></a>
+  <button class="iconbtn" id="theme" type="button" title="Switch theme" aria-label="Switch colour theme"><svg><use href="#i-moon"/></svg></button>
+</header>
+
+<!-- ======================== UPLOAD ======================== -->
+<main class="upload" id="upload">
+  <section class="intro">
+    <div>
+      <h1>Drop this week's lead exports. Get the master report.</h1>
+      <p>Meta, IndiaMART, JustDial and the Qualified pipeline file go in. A one-sheet Excel report, a live dashboard and a priority follow-up list come out.</p>
+    </div>
+    <div class="privacy">
+      <svg><use href="#i-lock"/></svg>
+      <p id="privacy-text">Files are processed inside this browser tab. Nothing is uploaded to any server.</p>
+    </div>
+  </section>
+
+  <section class="bench" id="bench" aria-labelledby="bench-title">
+    <div class="bench-head">
+      <h2 id="bench-title">Your reports</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" type="button" id="pick"><svg><use href="#i-up"/></svg>Choose files</button>
+        <button class="btn ghost" type="button" id="demo">Try with demo data</button>
+      </div>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="dropline">
+      <div class="lead"><svg><use href="#i-up"/></svg><div><b>Drag all files here at once</b><div class="muted" style="font-size:13.5px">Each file is recognised by its columns, so file names don't matter. .xlsx, .xls and .csv are accepted.</div></div></div>
+    </div>
+    <div class="extra" id="extra" aria-live="polite"></div>
+    <div class="runbar">
+      <label class="field">Report date (for ageing)
+        <input type="date" id="asof">
+      </label>
+      <p class="msg grow" id="run-msg">Add at least one report to start. All four give the complete picture.</p>
+      <button class="btn primary go" type="button" id="run" disabled>Generate report</button>
+    </div>
+    <input type="file" id="file" multiple accept=".xlsx,.xls,.xlsm,.csv" hidden>
+  </section>
+
+  <section class="below">
+    <div class="howto">
+      <h3>What you get</h3>
+      <ol>
+        <li><div><b>Master Excel report</b>KPIs, conversion funnel, salesperson scorecard, salesperson × source, source performance, after-qualification work, ageing, charts and findings, all on one sheet with live formulas.</div></li>
+        <li><div><b>Interactive dashboard</b>Sort any table, compare each salesperson against the team average, and export any table as CSV.</div></li>
+        <li><div><b>Priority follow-up list</b>Every qualified lead with no action yet, oldest first, with the contact number and a suggested next step.</div></li>
+        <li><div><b>Data checks</b>Missing files, unassigned leads, duplicate numbers and conflicting statuses are flagged instead of silently dropped.</div></li>
+      </ol>
+    </div>
+    <div class="history">
+      <h3>Recent reports</h3>
+      <div id="history"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================== REPORT ======================== -->
+<div class="report" id="report">
+  <nav class="rail" id="rail" aria-label="Report sections">
+    <div class="period" id="rail-period"></div>
+    <button type="button" data-panel="overview" aria-current="true"><svg><use href="#i-ov"/></svg>Overview</button>
+    <button type="button" data-panel="people"><svg><use href="#i-team"/></svg>Salespeople</button>
+    <button type="button" data-panel="sources"><svg><use href="#i-src"/></svg>Sources</button>
+    <button type="button" data-panel="pipeline"><svg><use href="#i-pipe"/></svg>After qualification</button>
+    <button type="button" data-panel="followup"><svg><use href="#i-call"/></svg>Follow-ups<span class="count" id="c-follow"></span></button>
+    <button type="button" data-panel="findings"><svg><use href="#i-bulb"/></svg>Findings<span class="count" id="c-find"></span></button>
+    <button type="button" data-panel="checks"><svg><use href="#i-check"/></svg>Data checks<span class="count" id="c-check"></span></button>
+    <div class="foot" id="rail-foot"></div>
+  </nav>
+
+  <div class="content" id="content">
+    <!-- Overview -->
+    <section class="panel on" id="p-overview" aria-labelledby="h-overview">
+      <div class="panel-head"><div><h2 id="h-overview" class="sr">Overview</h2><p class="headline" id="headline"></p></div></div>
+      <div class="ledgers">
+        <div class="card ledger"><h3><i></i>Lead handling</h3><div class="metrics" id="m-lead"></div></div>
+        <div class="card ledger pipe"><h3><i></i>After qualification</h3><div class="metrics" id="m-pipe"></div></div>
+      </div>
+      <p class="compare-note" id="compare-note"></p>
+      <div class="block">
+        <div class="block-head"><div><h3>Where leads drop off</h3><p>Each bar is a share of the first step in its group. The gap between bars is the leakage.</p></div></div>
+        <div class="funnel" id="funnel"></div>
+      </div>
+      <div class="block charts">
+        <div class="card chart wide"><h3>Leads per day by source</h3><div class="canvas"><canvas id="ch-trend" aria-label="Daily leads by source"></canvas></div></div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div><h3>Top findings</h3></div><button class="btn small ghost" type="button" data-goto="findings">See all findings</button></div>
+        <div class="findings" id="top-findings"></div>
+      </div>
+    </section>
+
+    <!-- Salespeople -->
+    <section class="panel" id="p-people" aria-labelledby="h-people">
+      <div class="panel-head"><div><h2 id="h-people">Salespeople</h2><p>Lead handling and after-qualification work in one row per person. Green means better than the team, red means worse.</p></div></div>
+      <div class="block" style="margin-top:0">
+        <div class="block-head"><h3>Scorecard</h3><div class="legend"><span><i style="background:var(--good)"></i>Better than team</span><span><i style="background:var(--bad)"></i>Worse than team</span></div></div>
+        <div id="t-score"></div>
+      </div>
+      <div class="block charts">
+        <div class="card chart"><h3>Lead → qualified vs conversion on worked leads</h3><div class="canvas"><canvas id="ch-conv"></canvas></div></div>
+        <div class="card chart"><h3>Lead status mix</h3><div class="canvas"><canvas id="ch-status"></canvas></div></div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div><h3>Salesperson × source</h3><p>How many leads each person picked up from each source, and how many qualified.</p></div></div>
+        <div id="t-ps"></div>
+      </div>
+    </section>
+
+    <!-- Sources -->
+    <section class="panel" id="p-sources" aria-labelledby="h-sources">
+      <div class="panel-head"><div><h2 id="h-sources">Sources</h2><p>Volume, lead quality and what happened after qualification, per source.</p></div></div>
+      <div id="t-src"></div>
+      <div class="block charts">
+        <div class="card chart"><h3>Share of leads</h3><div class="canvas"><canvas id="ch-share"></canvas></div></div>
+        <div class="card chart"><h3>Conversion by source</h3><div class="canvas"><canvas id="ch-srcconv"></canvas></div></div>
+      </div>
+      <div class="block" id="b-plat">
+        <div class="block-head"><h3>Meta: Facebook vs Instagram</h3></div>
+        <div id="t-plat"></div>
+      </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section class="panel" id="p-pipeline" aria-labelledby="h-pipeline">
+      <div class="panel-head"><div><h2 id="h-pipeline">After qualification</h2><p>"No action" means the lead is still sitting at Qualified. Won means cracked, Lost means not useful.</p></div></div>
+      <div id="pipe-empty"></div>
+      <div id="pipe-body">
+        <div id="t-pipe"></div>
+        <div class="block charts">
+          <div class="card chart"><h3>No action vs actioned</h3><div class="canvas"><canvas id="ch-pipe"></canvas></div></div>
+          <div class="card chart"><h3>How long leads have waited (no action)</h3><div class="canvas"><canvas id="ch-age"></canvas></div></div>
+        </div>
+        <div class="block">
+          <div class="block-head"><div><h3>Waiting time by salesperson</h3><p>Days since qualification for leads with no action, measured from the report date.</p></div></div>
+          <div id="t-age"></div>
+        </div>
+        <div class="block">
+          <div class="block-head"><h3>By customer type</h3></div>
+          <div id="t-ctype"></div>
+        </div>
+        <div class="block">
+          <div class="block-head"><h3>Leads that moved after qualification</h3></div>
+          <div id="t-act"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Follow-ups -->
+    <section class="panel" id="p-followup" aria-labelledby="h-follow">
+      <div class="panel-head"><div><h2 id="h-follow">Follow-ups</h2><p>Qualified leads with no action yet, oldest first. Critical is 5+ days, High is 3–4 days.</p></div>
+        <button class="btn" type="button" id="csv-follow"><svg><use href="#i-csv"/></svg>Export filtered list</button></div>
+      <div class="filters no-print">
+        <label class="field">Search<input type="search" id="f-q" placeholder="Name, number or record id"></label>
+        <label class="field">Salesperson<select id="f-sp"></select></label>
+        <label class="field">Source<select id="f-src"></select></label>
+        <div class="field">Priority<div class="chips" id="f-pri"></div></div>
+        <span class="resultcount" id="f-count"></span>
+      </div>
+      <div id="t-follow"></div>
+      <div class="block" id="b-un">
+        <div class="block-head"><div><h3>Unassigned leads</h3><p>No salesperson on these yet. Assign them before they go cold.</p></div></div>
+        <div id="t-un"></div>
+      </div>
+    </section>
+
+    <!-- Findings -->
+    <section class="panel" id="p-findings" aria-labelledby="h-find">
+      <div class="panel-head"><div><h2 id="h-find">Findings</h2><p>Generated from this week's numbers, each with a next step and an owner.</p></div>
+        <div class="chips" id="f-area"></div></div>
+      <div class="findings" id="findings"></div>
+    </section>
+
+    <!-- Checks -->
+    <section class="panel" id="p-checks" aria-labelledby="h-checks">
+      <div class="panel-head"><div><h2 id="h-checks">Data checks</h2><p>What was read, how statuses were interpreted, and anything worth fixing in the source data.</p></div></div>
+      <div id="t-files"></div>
+      <div class="block checks" id="checks"></div>
+    </section>
+  </div>
+</div>
+
+<dialog id="proc" aria-labelledby="proc-title">
+  <div class="proc">
+    <h2 id="proc-title">Building your report</h2>
+    <p class="muted" id="proc-sub">This takes a few seconds.</p>
+    <ol class="steps" id="proc-steps"></ol>
+    <p class="note" id="proc-note"></p>
+  </div>
+</dialog>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-name" tabindex="-1">
+  <header><div style="flex:1;min-width:0"><h2 id="dr-name"></h2><p id="dr-sub"></p></div>
+    <button class="iconbtn" id="dr-close" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button></header>
+  <div class="body" id="dr-body"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script>
+"use strict";
+/* =====================================================================
+   OakCraft Report Studio – front-end
+   Engine modes:
+     server  – server/app.py is running (detected via /api/health)
+     browser – Pyodide runs engine/*.py inside this tab (GitHub Pages)
+   ===================================================================== */
+const VERSION = "1.0.0";
+const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
+const ENGINE_FILES = ["__init__.py", "loader.py", "analytics.py", "excel_report.py", "demo_data.py"];
+const KINDS = [
+  {kind:"meta", label:"Meta Leads", icon:"i-meta", hint:"meta_leads_*.xlsx", what:"Salesperson in col H, status in col G"},
+  {kind:"indiamart", label:"IndiaMART", icon:"i-im", hint:"OakCraft-indiamart-*.xlsx", what:"Salesperson in col L, status in col K"},
+  {kind:"justdial", label:"JustDial", icon:"i-jd", hint:"OakCraft-enquiries-*.xlsx", what:"Salesperson in col G, status in col P"},
+  {kind:"pipeline", label:"Qualified Pipeline", icon:"i-q", hint:"OakCraft-qualified-*.xlsx", what:"Source col A, salesperson K, status L"}
+];
+const HISTORY_KEY = "ocrs.history.v1";
+
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const state = {mode:null, py:null, ready:false, files:[], summary:null, xlsx:null, charts:{}, panel:"overview",
+               follow:{q:"", sp:"", src:"", pri:new Set()}, area:""};
+
+/* ---------------------------------------------------------------- format */
+const nf = new Intl.NumberFormat("en-IN");
+const F = {
+  int: v => v == null ? "–" : (v === 0 ? "–" : nf.format(v)),
+  int0: v => v == null ? "–" : nf.format(v),
+  pct: v => v == null ? "–" : (v === 0 ? "–" : (v*100).toFixed(1) + "%"),
+  pct0: v => v == null ? "–" : Math.round(v*100) + "%",
+  days: v => v == null ? "–" : v + (v === 1 ? " day" : " days"),
+  date: v => { if (!v) return "–"; const d = new Date(v.slice(0,10) + "T00:00:00"); return d.toLocaleDateString("en-GB", {day:"numeric", month:"short"}); },
+  dateY: v => { if (!v) return "–"; const d = new Date(v.slice(0,10) + "T00:00:00"); return d.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}); },
+  text: v => v == null || v === "" ? "–" : v
+};
+function toast(msg, err=false){
+  const t = $("#toast"); t.textContent = msg; t.classList.toggle("err", err); t.classList.add("on");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), err ? 6000 : 3000);
+}
+function setPill(st, txt){ const p = $("#engine-pill"); p.dataset.state = st; $(".txt", p).textContent = txt; }
+
+/* ---------------------------------------------------------------- theme */
+(function theme(){
+  const root = document.documentElement, btn = $("#theme");
+  let saved = null; try { saved = localStorage.getItem("ocrs.theme"); } catch(e){}
+  if (saved) root.dataset.theme = saved;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const icon = () => $("use", btn).setAttribute("href", isDark() ? "#i-sun" : "#i-moon");
+  icon();
+  btn.addEventListener("click", () => {
+    root.dataset.theme = isDark() ? "light" : "dark"; icon();
+    try { localStorage.setItem("ocrs.theme", root.dataset.theme); } catch(e){}
+    if (state.summary) renderCharts(state.summary);
+  });
+})();
+
+/* ---------------------------------------------------------------- engine */
+async function detectMode(){
+  if (location.protocol === "file:" || /\.github\.io$/i.test(location.hostname)) return "browser";
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 1500);
+    const r = await fetch("api/health", {signal:ctl.signal, cache:"no-store"}); clearTimeout(t);
+    if (r.ok && (await r.json()).mode === "server") return "server";
+  } catch(e){}
+  return "browser";
+}
+function loadScript(src){
+  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("Could not load " + src)); document.head.appendChild(s); });
+}
+async function bootBrowserEngine(){
+  setPill("loading", "Loading Python engine…");
+  await loadScript(PYODIDE + "pyodide.js");
+  const py = await loadPyodide({indexURL: PYODIDE});
+  setPill("loading", "Loading pandas…");
+  await py.loadPackage(["pandas", "micropip"]);
+  setPill("loading", "Loading Excel writer…");
+  await py.pyimport("micropip").install("openpyxl");
+  py.FS.mkdirTree("/home/pyodide/engine"); py.FS.mkdirTree("/data"); py.FS.mkdirTree("/out");
+  for (const f of ENGINE_FILES){
+    const r = await fetch("engine/" + f + "?v=" + VERSION);
+    if (!r.ok) throw new Error("engine/" + f + " not found (" + r.status + ")");
+    py.FS.writeFile("/home/pyodide/engine/" + f, await r.text());
+  }
+  py.runPython("import sys\nif '/home/pyodide' not in sys.path: sys.path.insert(0, '/home/pyodide')\nimport engine");
+  state.py = py;
+}
+async function boot(){
+  state.mode = await detectMode();
+  $("#privacy-text").textContent = state.mode === "server"
+    ? "Files are processed by the OakCraft Report Studio server you are connected to and are not stored."
+    : "Files are processed inside this browser tab. Nothing is uploaded to any server.";
+  try {
+    if (state.mode === "browser") await bootBrowserEngine();
+    state.ready = true;
+    setPill("ready", state.mode === "server" ? "Engine ready · server" : "Engine ready · in browser");
+    for (const f of state.files) if (!f.info) await inspect(f);
+    refreshBench();
+  } catch(err){
+    console.error(err);
+    setPill("error", "Engine failed to load");
+    $("#run-msg").innerHTML = "The report engine could not start: " + esc(err.message) +
+      ". Check your internet connection (the engine is downloaded once) and reload. If you opened the file directly, serve the folder instead – see the guide.";
+  }
+}
+
+/* inspect one file → {kind,label,rows} */
+async function inspect(f){
+  if (!state.ready){ f.info = null; return; }
+  try {
+    if (state.mode === "server"){
+      const fd = new FormData(); fd.append("files", new Blob([f.bytes]), f.name);
+      const r = await fetch("api/inspect", {method:"POST", body:fd}); f.info = (await r.json())[0];
+    } else {
+      const py = state.py, path = "/data/" + f.id;
+      py.FS.writeFile(path, f.bytes);
+      py.globals.set("_n", f.name); py.globals.set("_p", path);
+      f.info = JSON.parse(py.runPython("engine.inspect_json(_n, open(_p,'rb').read())"));
+    }
+  } catch(err){ f.info = {kind:null, label:"Unreadable", rows:0, error:String(err.message||err)}; }
+}
+
+/* ---------------------------------------------------------------- bench (upload) */
+let fileSeq = 0;
+async function addFiles(list){
+  const added = [];
+  for (const file of list){
+    if (!/\.(xlsx|xlsm|xls|csv)$/i.test(file.name)){ toast(file.name + " is not an Excel or CSV file", true); continue; }
+    const f = {id: "f" + (++fileSeq), name:file.name, size:file.size, bytes:new Uint8Array(await file.arrayBuffer()), info:null};
+    state.files.push(f); added.push(f);
+  }
+  refreshBench();
+  for (const f of added){ await inspect(f); }
+  refreshBench(added.map(f => f.info && f.info.kind).filter(Boolean));
+}
+function removeFile(id){ state.files = state.files.filter(f => f.id !== id); refreshBench(); }
+
+function refreshBench(justKinds=[]){
+  const slots = $("#slots"); slots.innerHTML = "";
+  const byKind = {}; const extra = [];
+  for (const f of state.files){
+    const k = f.info && f.info.kind;
+    if (k){ (byKind[k] = byKind[k] || []).push(f); } else if (f.info) extra.push(f);
+  }
+  const pending = state.files.filter(f => !f.info);
+  for (const k of KINDS){
+    const fs = byKind[k.kind] || [];
+    const el = document.createElement("div");
+    el.className = "slot" + (fs.length ? " filled" : "") + (justKinds.includes(k.kind) ? " just-filled" : "");
+    let body = `<div class="src"><svg><use href="#${k.icon}"/></svg>${esc(k.label)}</div>`;
+    if (fs.length){
+      body += fs.map(f => `<div class="file">${esc(f.name)}</div>`).join("");
+      const rows = fs.reduce((a, f) => a + (f.info.rows || 0), 0);
+      body += `<div class="state"><svg width="14" height="14"><use href="#i-check"/></svg>${nf.format(rows)} rows${fs.length > 1 ? " · " + fs.length + " files" : ""}</div>`;
+      body += `<button class="iconbtn x" type="button" title="Remove" aria-label="Remove ${esc(k.label)} file" data-rm="${fs.map(f=>f.id).join(",")}"><svg><use href="#i-x"/></svg></button>`;
+    } else {
+      body += `<div class="hint">${esc(k.hint)}</div><div class="what">${esc(k.what)}</div><div class="state">Waiting for file</div>`;
+    }
+    el.innerHTML = body; slots.appendChild(el);
+  }
+  const ex = $("#extra"); ex.innerHTML = "";
+  for (const f of pending){
+    ex.insertAdjacentHTML("beforeend", `<div class="row dup"><span>${esc(f.name)}</span><em>${state.ready ? "Checking…" : "Will be checked when the engine is ready"}</em></div>`);
+  }
+  for (const f of extra){
+    ex.insertAdjacentHTML("beforeend", `<div class="row"><span>${esc(f.name)}</span><em>${esc(f.info.error ? "Could not be read" : "Not a recognised OakCraft export")}</em><button class="iconbtn" type="button" aria-label="Remove" data-rm="${f.id}"><svg><use href="#i-x"/></svg></button></div>`);
+  }
+  $$("[data-rm]").forEach(b => b.addEventListener("click", () => b.dataset.rm.split(",").forEach(removeFile)));
+  const have = KINDS.filter(k => byKind[k.kind]).map(k => k.label);
+  const miss = KINDS.filter(k => !byKind[k.kind]).map(k => k.label);
+  const run = $("#run");
+  run.disabled = !state.ready || have.length === 0 || pending.length > 0;
+  const msg = $("#run-msg");
+  if (!state.ready && $("#engine-pill").dataset.state !== "error") msg.textContent = "The engine is still loading. You can add files now.";
+  else if (state.ready && !have.length) msg.textContent = "Add at least one report to start. All four give the complete picture.";
+  else if (state.ready && miss.length) msg.textContent = "Missing: " + miss.join(", ") + ". You can still generate; those sections will be empty.";
+  else if (state.ready) msg.textContent = "All four reports are in.";
+}
+
+const bench = $("#bench");
+["dragenter","dragover"].forEach(e => bench.addEventListener(e, ev => { ev.preventDefault(); bench.classList.add("drag"); }));
+["dragleave","drop"].forEach(e => bench.addEventListener(e, ev => { ev.preventDefault(); if (e === "dragleave" && bench.contains(ev.relatedTarget)) return; bench.classList.remove("drag"); }));
+bench.addEventListener("drop", ev => { ev.stopPropagation(); addFiles([...ev.dataTransfer.files]); });
+window.addEventListener("dragover", e => e.preventDefault());
+window.addEventListener("drop", e => { e.preventDefault(); if (!document.body.classList.contains("has-report")) addFiles([...e.dataTransfer.files]); });
+$("#pick").addEventListener("click", () => $("#file").click());
+$("#file").addEventListener("change", e => { const list = [...e.target.files]; e.target.value = ""; addFiles(list); });
+$("#asof").value = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+$("#demo").addEventListener("click", async () => {
+  if (!state.ready){ toast("The engine is still loading – try again in a moment."); return; }
+  try {
+    let files;
+    if (state.mode === "server"){
+      const r = await (await fetch("api/demo", {method:"POST"})).json();
+      files = r.files.map(f => ({name:f.name, bytes:Uint8Array.from(atob(f.b64), c => c.charCodeAt(0))}));
+    } else {
+      const py = state.py;
+      const names = py.runPython("import os\nfrom engine.demo_data import generate\nos.makedirs('/demo', exist_ok=True)\n_d = generate()\nfor _n,_b in _d: open('/demo/'+_n,'wb').write(_b)\n[_n for _n,_b in _d]").toJs();
+      files = names.map(n => ({name:n, bytes:py.FS.readFile("/demo/" + n)}));
+    }
+    state.files = [];
+    await addFiles(files.map(f => new File([f.bytes], f.name)));
+    toast("Demo files added. These are made-up leads, not OakCraft data.");
+  } catch(err){ console.error(err); toast("Could not create demo data: " + err.message, true); }
+});
+
+/* ---------------------------------------------------------------- run */
+const STEPS = ["Reading files", "Standardising statuses and names", "Analysing salespeople, sources and pipeline", "Building the Excel report"];
+function stepUI(i){
+  $("#proc-steps").innerHTML = STEPS.map((s, k) => `<li class="${k < i ? "done" : k === i ? "doing" : ""}"><i></i>${esc(s)}</li>`).join("");
+}
+const tick = () => new Promise(r => setTimeout(r, 30));
+$("#run").addEventListener("click", generate);
+async function generate(){
+  const files = state.files.filter(f => f.info && f.info.kind);
+  if (!files.length) return;
+  const dlg = $("#proc"); stepUI(0); $("#proc-note").textContent = ""; dlg.showModal();
+  const asof = $("#asof").value;
+  const t0 = performance.now();
+  try {
+    let summary, xlsx;
+    if (state.mode === "server"){
+      stepUI(1);
+      const fd = new FormData(); files.forEach(f => fd.append("files", new Blob([f.bytes]), f.name)); fd.append("asof", asof);
+      const r = await fetch("api/process", {method:"POST", body:fd});
+      const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText);
+      stepUI(3); await tick();
+      summary = j.summary; xlsx = j.xlsx ? Uint8Array.from(atob(j.xlsx), c => c.charCodeAt(0)) : null;
+    } else {
+      const py = state.py;
+      for (const f of files) py.FS.writeFile("/data/" + f.id, f.bytes);
+      stepUI(1); await tick();
+      py.globals.set("_files", py.toPy(files.map(f => [f.name, "/data/" + f.id])));
+      py.globals.set("_asof", asof);
+      stepUI(2); await tick();
+      const json = py.runPython(`
+import json, engine, os
+_res, _x = engine.process([(n, open(p, 'rb').read()) for n, p in _files], _asof)
+if _x:
+    open('/out/report.xlsx', 'wb').write(_x)
+elif os.path.exists('/out/report.xlsx'):
+    os.remove('/out/report.xlsx')
+json.dumps(_res, ensure_ascii=False)`);
+      stepUI(3); await tick();
+      summary = JSON.parse(json);
+      xlsx = summary.kpi && (summary.meta.has_leads || summary.meta.has_pipeline) ? py.FS.readFile("/out/report.xlsx") : null;
+    }
+    stepUI(4);
+    $("#proc-note").textContent = "Done in " + ((performance.now() - t0)/1000).toFixed(1) + " s.";
+    await new Promise(r => setTimeout(r, 350));
+    dlg.close();
+    const hid = saveHistory(summary, xlsx);
+    showReport(summary, xlsx, hid);
+  } catch(err){
+    console.error(err); dlg.close();
+    toast("The report could not be built: " + (err.message || err), true);
+  }
+}
+
+/* ---------------------------------------------------------------- history */
+function b64(u8){ let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function readHistory(){ try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch(e){ return []; } }
+function saveHistory(summary, xlsx){
+  const item = {id: Date.now(), created: new Date().toISOString(), summary, xlsx: xlsx ? b64(xlsx) : null};
+  summary.meta.generated = item.created;
+  let h = [item, ...readHistory()].slice(0, 5);
+  while (h.length){ try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); break; } catch(e){ h = h.slice(0, -1); } }
+  renderHistory();
+  return item.id;
+}
+function previousOf(id){
+  const h = readHistory(), i = h.findIndex(x => x.id === id);
+  const cand = i >= 0 ? h.slice(i + 1) : h;
+  const cur = state.summary;
+  return cand.find(x => x.summary && (x.summary.meta.lead_from !== cur.meta.lead_from || JSON.stringify(x.summary.kpi) !== JSON.stringify(cur.kpi))) || null;
+}
+function renderHistory(){
+  const h = readHistory(), box = $("#history");
+  if (!h.length){ box.innerHTML = `<p class="empty">Reports you generate are kept here on this computer, so you can reopen them without uploading again.</p>`; return; }
+  box.innerHTML = `<ul>${h.map(it => { const m = it.summary.meta, k = it.summary.kpi;
+    return `<li><button type="button" data-h="${it.id}"><b>${esc(m.lead_from ? F.date(m.lead_from) + " – " + F.dateY(m.lead_to) : "Pipeline only")}</b><small>${esc(F.dateY(it.created))}</small><small>${nf.format(k.leads)} leads · ${nf.format(k.qualified)} qualified · ${nf.format(k.pipe_total)} in pipeline</small></button></li>`; }).join("")}</ul>
+    <button class="btn small ghost" type="button" id="clear-h" style="margin-top:8px">Clear history</button>`;
+  $$("[data-h]", box).forEach(b => b.addEventListener("click", () => {
+    const it = readHistory().find(x => String(x.id) === b.dataset.h); if (!it) return;
+    showReport(it.summary, it.xlsx ? Uint8Array.from(atob(it.xlsx), c => c.charCodeAt(0)) : null, it.id);
+  }));
+  $("#clear-h").addEventListener("click", () => { try { localStorage.removeItem(HISTORY_KEY); } catch(e){} renderHistory(); });
+}
+
+/* ---------------------------------------------------------------- tables */
+/* cols: {key,label,fmt,t(left),cls(row)->class, html(row)->string} ; opts: {total, sortable, csv, id, rowClass} */
+function table(host, cols, rows, opts={}){
+  host = typeof host === "string" ? $(host) : host;
+  const st = {rows:rows.slice(), sortKey:null, dir:1};
+  const wrap = document.createElement("div");
+  const head = opts.csv ? `<div style="display:flex;justify-content:flex-end;margin:-4px 0 6px" class="no-print"><button class="btn small ghost" type="button"><svg><use href="#i-csv"/></svg>Export CSV</button></div>` : "";
+  wrap.innerHTML = head + `<div class="tablewrap${opts.tall ? " tall" : ""}"><table><thead><tr>${cols.map((c, i) =>
+    `<th class="${c.t ? "t " : ""}${opts.sortable !== false && !opts.grouped ? "sortable" : ""}" data-i="${i}" scope="col">${esc(c.label)}</th>`).join("")}</tr></thead><tbody></tbody><tfoot></tfoot></table></div>`;
+  host.innerHTML = ""; host.appendChild(wrap);
+  const cell = (c, r) => {
+    const v = r[c.key];
+    const inner = c.html ? c.html(r) : esc((F[c.fmt || "text"] || F.text)(v));
+    const cls = [c.t ? "t" : "", c.wrap ? "wrap" : "", c.cls ? c.cls(r) || "" : "", (v === 0 && !c.t) ? "zero" : ""].join(" ").trim();
+    return `<td class="${cls}">${inner}</td>`;
+  };
+  const draw = () => {
+    $("tbody", wrap).innerHTML = st.rows.map(r => `<tr class="${opts.rowClass ? opts.rowClass(r) : ""}">${cols.map(c => cell(c, r)).join("")}</tr>`).join("") ||
+      `<tr><td class="t faint" colspan="${cols.length}">Nothing to show.</td></tr>`;
+    $("tfoot", wrap).innerHTML = opts.total ? `<tr class="total">${cols.map(c => cell(c, opts.total)).join("")}</tr>` : "";
+  };
+  if (opts.sortable !== false && !opts.grouped){
+    $$("th", wrap).forEach(th => th.addEventListener("click", () => {
+      const c = cols[+th.dataset.i];
+      st.dir = st.sortKey === c.key ? -st.dir : (c.t ? 1 : -1); st.sortKey = c.key;
+      st.rows.sort((a, b) => { const x = a[c.key], y = b[c.key]; if (x == null) return 1; if (y == null) return -1;
+        return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * st.dir; });
+      $$("th", wrap).forEach(h => h.removeAttribute("aria-sort"));
+      th.setAttribute("aria-sort", st.dir === 1 ? "ascending" : "descending"); draw();
+    }));
+  }
+  if (opts.csv) $(".btn", wrap).addEventListener("click", () => downloadCSV(opts.csv, cols, st.rows.concat(opts.total ? [opts.total] : [])));
+  draw();
+  return {set(rows){ st.rows = rows.slice(); draw(); }};
+}
+function csvVal(c, r){
+  const v = c.csv ? c.csv(r) : r[c.key];
+  if (v == null) return "";
+  if (c.fmt === "pct" || c.fmt === "pct0") return (v*100).toFixed(1) + "%";
+  return String(v);
+}
+function downloadCSV(name, cols, rows){
+  const q = s => /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  const lines = [cols.map(c => q(c.label)).join(",")].concat(rows.map(r => cols.map(c => q(csvVal(c, r))).join(",")));
+  saveBlob(new Blob(["﻿" + lines.join("\r\n")], {type:"text/csv;charset=utf-8"}), name + ".csv");
+}
+function saveBlob(blob, name){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const vsTeam = (key, team, better="high") => r => {
+  if (r.name === "Unassigned" || r._team || r[key] == null || team[key] == null) return "";
+  if (better === "high") return r[key] >= team[key] ? "good" : "bad";
+  return r[key] > team[key] / Math.max(1, (state.summary.meta.people || []).length) ? "bad" : "";
+};
+const STATUS_TAG = {"Qualified":"q", "Not Qualified":"nq", "Call Not Pick":"cnp", "Pending (Not Worked)":"pend", "Won":"won", "Lost":"lost", "No Action":"pend"};
+const tag = (txt, cls) => `<span class="tag ${cls || STATUS_TAG[txt] || "prog"}">${esc(txt)}</span>`;
+const telLink = n => n ? `<a class="tel" href="tel:${esc(n)}">${esc(n)}</a>` : "–";
+const personCell = r => (r._team || r._t || r.name === "Unassigned" || !(state.summary.meta.people || []).includes(r.name))
+  ? `<b>${esc(r.name)}</b>` : `<button type="button" class="namebtn" data-person="${esc(r.name)}" title="Open ${esc(r.name)}'s summary">${esc(r.name)}</button>`;
+
+/* ---------------------------------------------------------------- report render */
+function showReport(s, xlsx, hid=null){
+  state.summary = s; state.xlsx = xlsx;
+  const prev = previousOf(hid); state.prev = prev ? prev.summary : null;
+  document.body.classList.add("has-report");
+  window.scrollTo(0, 0);
+  const m = s.meta;
+  $("#rail-period").innerHTML = m.lead_from ? `<b>${F.date(m.lead_from)} – ${F.dateY(m.lead_to)}</b>Leads period` : `<b>Pipeline only</b>No lead files`;
+  $("#rail-foot").textContent = `Report date ${F.dateY(m.asof)} · engine ${m.engine || VERSION}`;
+  $("#dl-xlsx").disabled = !xlsx;
+  renderOverview(s); renderPeople(s); renderSources(s); renderPipeline(s); renderFollow(s); renderFindings(s); renderChecks(s);
+  go("overview");
+  if (window.Chart) renderCharts(s); else window.addEventListener("load", () => renderCharts(s), {once:true});
+}
+function go(panel){
+  state.panel = panel;
+  $$(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + panel));
+  $$("#rail button").forEach(b => b.setAttribute("aria-current", String(b.dataset.panel === panel)));
+  if (matchMedia("(max-width:860px)").matches) window.scrollTo({top:0});
+}
+$$("#rail button").forEach(b => b.addEventListener("click", () => go(b.dataset.panel)));
+document.addEventListener("click", e => { const g = e.target.closest("[data-goto]"); if (g) go(g.dataset.goto); });
+
+function metric(v, label, sub, alert, delta){
+  return `<div class="metric${alert ? " alert" : ""}"><div class="v">${v}</div><div class="l">${esc(label)}</div>${sub ? `<div class="s">${esc(sub)}</div>` : ""}${delta ? `<div class="delta ${delta.cls}">${esc(delta.txt)}</div>` : ""}</div>`;
+}
+/* change vs the previous report in history; better = "up" | "down" */
+function delta(key, kind="int", better="up"){
+  const p = state.prev && state.prev.kpi, k = state.summary.kpi;
+  if (!p || p[key] == null || k[key] == null) return null;
+  const d = k[key] - p[key];
+  if (Math.abs(d) < 1e-9) return {cls:"flat", txt:"No change vs last report"};
+  const txt = (d > 0 ? "+" : "−") + (kind === "pct" ? (Math.abs(d)*100).toFixed(1) + " pts" : nf.format(Math.abs(d))) + " vs last report";
+  return {cls:better === "flat" ? "flat" : (d > 0) === (better === "up") ? "up" : "down", txt};
+}
+
+function renderOverview(s){
+  const k = s.kpi, m = s.meta;
+  const parts = [];
+  if (m.has_leads) parts.push(`<strong>${nf.format(k.leads)} leads</strong> came in and <strong>${nf.format(k.qualified)} qualified</strong> (${F.pct(k.conv)}).`);
+  if (k.pending) parts.push(`${nf.format(k.pending)} have not been worked yet.`);
+  if (m.has_pipeline) parts.push(`Of ${nf.format(k.pipe_total)} qualified leads in the pipeline, <strong>${nf.format(k.actioned)} moved forward</strong> and ${nf.format(k.won)} ${k.won === 1 ? "was" : "were"} won.`);
+  $("#headline").innerHTML = parts.join(" ") || "No recognised data in these files.";
+  $("#m-lead").innerHTML = m.has_leads ? [
+    metric(nf.format(k.leads), "Leads received", "", false, delta("leads")),
+    metric(F.pct0(k.worked_pct), "Leads worked", `${nf.format(k.worked)} contacted`, false, delta("worked_pct", "pct")),
+    metric(nf.format(k.qualified), "Qualified", `${F.pct(k.conv)} of all leads`, false, delta("qualified")),
+    metric(F.pct(k.conv_worked), "Conversion on worked leads", "Qualified ÷ contacted", false, delta("conv_worked", "pct")),
+    metric(nf.format(k.pending), "Not worked yet", "Created / New", k.pending > 0, delta("pending", "int", "down")),
+    metric(nf.format(k.unassigned), "Unassigned", k.unassigned ? "Need an owner" : "Every lead has an owner", k.unassigned > 0, delta("unassigned", "int", "down"))
+  ].join("") : `<p class="faint" style="grid-column:1/-1;padding:12px 0">Add the Meta, IndiaMART or JustDial file to see lead handling.</p>`;
+  $("#m-pipe").innerHTML = m.has_pipeline ? [
+    metric(nf.format(k.pipe_total), "Qualified in pipeline", "", false, delta("pipe_total")),
+    metric(nf.format(k.no_action), "No action yet", "Still at Qualified", k.no_action > 0, delta("no_action", "int", "down")),
+    metric(F.pct(k.action_rate), "Action rate", `${nf.format(k.actioned)} moved forward`, false, delta("action_rate", "pct")),
+    metric(nf.format(k.won), "Won", F.pct(k.win_rate) + " of qualified", false, delta("won")),
+    metric(nf.format(k.lost), "Lost", "", false, delta("lost", "int", "flat")),
+    metric(nf.format(k.na5), "Waiting 5+ days", "No action", k.na5 > 0, delta("na5", "int", "down"))
+  ].join("") : `<p class="faint" style="grid-column:1/-1;padding:12px 0">Add the Qualified file to see what happened after qualification.</p>`;
+
+  const pv = state.prev;
+  $("#compare-note").textContent = pv ? `Changes are compared with the previous report (leads ${pv.meta.lead_from ? F.date(pv.meta.lead_from) + " – " + F.dateY(pv.meta.lead_to) : "n/a"}${pv.meta.generated ? ", generated " + F.dateY(pv.meta.generated) : ""}).` : "Generate next week's report here and each number will show the change against this one.";
+  const groups = [["lead", "Lead files"], ["pipe", "Qualified pipeline"]];
+  $("#funnel").innerHTML = groups.map(([g, title]) => {
+    const st = s.funnel.filter(x => x.group === g);
+    return `<div class="card fgroup ${g}"><h3>${title}</h3>${st.map((x, i) => {
+      const w = Math.max(x.of_top * 100, 1.5);
+      const conv = i ? `<div class="conv"><b>${F.pct0(x.of_prev)}</b> of previous step · ${nf.format(x.leak || 0)} dropped</div>` : "";
+      const inside = w >= 34;
+      return `${conv}<div class="fstep"><div class="track"><div class="bar" style="width:${w}%">${inside ? esc(x.stage) : ""}</div>${inside ? "" : `<span class="out">${esc(x.stage)}</span>`}</div><div class="val">${nf.format(x.value)}</div></div>`;
+    }).join("")}</div>`;
+  }).join("");
+  renderFindingList("#top-findings", s.insights.filter(x => x.severity === "high").slice(0, 3));
+}
+
+function scoreCols(team){
+  return [
+    {key:"name", label:"Salesperson", t:1, html:personCell},
+    {key:"leads", label:"Leads", fmt:"int"},
+    {key:"worked_pct", label:"Worked", fmt:"pct", cls:vsTeam("worked_pct", team)},
+    {key:"qualified", label:"Qualified", fmt:"int"},
+    {key:"conv", label:"Lead → qualified", fmt:"pct", cls:vsTeam("conv", team)},
+    {key:"conv_worked", label:"Conv. on worked", fmt:"pct", cls:vsTeam("conv_worked", team)},
+    {key:"call_not_pick", label:"Call not pick", fmt:"int"},
+    {key:"pending", label:"Not worked", fmt:"int", cls:vsTeam("pending", team, "low")},
+    {key:"pipe", label:"In pipeline", fmt:"int"},
+    {key:"no_action", label:"No action", fmt:"int"},
+    {key:"actioned", label:"Actioned", fmt:"int"},
+    {key:"action_rate", label:"Action rate", fmt:"pct", cls:vsTeam("action_rate", team)},
+    {key:"won", label:"Won", fmt:"int"},
+    {key:"lost", label:"Lost", fmt:"int"},
+    {key:"na5", label:"Waiting 5+ days", fmt:"int", cls:vsTeam("na5", team, "low")}
+  ];
+}
+function renderPeople(s){
+  const team = s.scorecard.team;
+  table("#t-score", scoreCols(team), s.scorecard.rows, {total:{...team, name:"Team", _team:1}, csv:"salesperson-scorecard"});
+  const rows = [];
+  for (const p of s.person_source){
+    rows.push({...p.total, name:p.name, src:"All sources", share:1, _k:"sub"});
+    p.sources.forEach(c => rows.push({...c, name:p.name, src:c.source, _k:"child"}));
+  }
+  const tot = {...s.scorecard.team, name:"All salespeople", src:"All sources", share:null};
+  table("#t-ps", [
+    {key:"name", label:"Salesperson", t:1, html:r => r._k === "child" ? "" : personCell(r), csv:r => r.name},
+    {key:"src", label:"Source", t:1},
+    {key:"leads", label:"Leads", fmt:"int"},
+    {key:"qualified", label:"Qualified", fmt:"int"},
+    {key:"not_qualified", label:"Not qualified", fmt:"int"},
+    {key:"call_not_pick", label:"Call not pick", fmt:"int"},
+    {key:"pending", label:"Not worked", fmt:"int"},
+    {key:"conv", label:"Lead → qualified", fmt:"pct"},
+    {key:"worked", label:"Worked", fmt:"int"},
+    {key:"conv_worked", label:"Conv. on worked", fmt:"pct"},
+    {key:"share", label:"Share of person's leads", fmt:"pct0"}
+  ], rows, {grouped:true, total:tot, csv:"salesperson-by-source", rowClass:r => r._k === "sub" ? "sub" : "child"});
+}
+
+function renderSources(s){
+  const rows = s.sources.rows, k = s.kpi;
+  const tot = {source:"Total", leads:k.leads, share:1, qualified:k.qualified, not_qualified:k.not_qualified, call_not_pick:k.call_not_pick,
+    pending:k.pending, conv:k.conv, conv_worked:k.conv_worked, share_q:1, unassigned:k.unassigned, pipe:k.pipe_total, actioned:k.actioned,
+    action_rate:k.action_rate, won:k.won, win_rate:k.win_rate};
+  const bar = key => r => r.source === "Total" ? esc(F.pct(r[key])) : `<span class="bar-in" style="width:${Math.round((r[key]||0)*60)}px"></span>${esc(F.pct(r[key]))}`;
+  table("#t-src", [
+    {key:"source", label:"Source", t:1, html:r => `<b>${esc(r.source)}</b>`},
+    {key:"leads", label:"Leads", fmt:"int"}, {key:"share", label:"Share of leads", fmt:"pct"},
+    {key:"qualified", label:"Qualified", fmt:"int"}, {key:"not_qualified", label:"Not qualified", fmt:"int"},
+    {key:"call_not_pick", label:"Call not pick", fmt:"int"}, {key:"pending", label:"Not worked", fmt:"int"},
+    {key:"conv", label:"Lead → qualified", fmt:"pct", html:bar("conv")},
+    {key:"conv_worked", label:"Conv. on worked", fmt:"pct", html:bar("conv_worked")},
+    {key:"share_q", label:"Share of qualified", fmt:"pct"}, {key:"unassigned", label:"Unassigned", fmt:"int"},
+    {key:"pipe", label:"In pipeline", fmt:"int"}, {key:"actioned", label:"Actioned", fmt:"int"},
+    {key:"action_rate", label:"Action rate", fmt:"pct"}, {key:"won", label:"Won", fmt:"int"}
+  ], rows, {total:tot, csv:"source-performance"});
+  $("#b-plat").hidden = !s.sources.platforms.length;
+  if (s.sources.platforms.length) table("#t-plat", [
+    {key:"platform", label:"Platform", t:1, html:r => `<b>${esc(r.platform)}</b>`},
+    {key:"leads", label:"Leads", fmt:"int"}, {key:"share", label:"Share of Meta", fmt:"pct"},
+    {key:"qualified", label:"Qualified", fmt:"int"}, {key:"not_qualified", label:"Not qualified", fmt:"int"},
+    {key:"call_not_pick", label:"Call not pick", fmt:"int"}, {key:"pending", label:"Not worked", fmt:"int"},
+    {key:"conv", label:"Lead → qualified", fmt:"pct"}, {key:"conv_worked", label:"Conv. on worked", fmt:"pct"}
+  ], s.sources.platforms, {csv:"meta-platforms"});
+}
+
+function renderPipeline(s){
+  const has = s.meta.has_pipeline, P = s.pipeline;
+  $("#pipe-body").hidden = !has;
+  $("#pipe-empty").innerHTML = has ? "" : `<div class="card" style="padding:20px"><h3>No Qualified file in this report</h3><p class="muted" style="margin-top:6px">Add the OakCraft Qualified export (source in column A, salesperson in K, status in L) to see what happened after qualification.</p></div>`;
+  if (!has) return;
+  const stageCols = P.stages.map(st => ({key:"st_" + st, label:st === "No Action" ? "No action" : st, fmt:"int",
+    cls:r => st === "No Action" && r.no_action && !r._t ? "bad heat" : st === "Won" && r.won && !r._t ? "good heat" : ""}));
+  const flat = b => { const o = {...b}; for (const st of P.stages) o["st_" + st] = b.stages[st]; return o; };
+  const rows = [];
+  for (const p of P.people){
+    rows.push({...flat(p.total), name:p.name, src:"All sources", _k:"sub"});
+    p.sources.forEach(c => rows.push({...flat(c), name:p.name, src:c.source, _k:"child"}));
+  }
+  table("#t-pipe", [
+    {key:"name", label:"Salesperson", t:1, html:r => r._k === "child" ? "" : personCell(r), csv:r => r.name},
+    {key:"src", label:"Source", t:1},
+    {key:"total", label:"Qualified leads", fmt:"int"}, ...stageCols,
+    {key:"actioned", label:"Actioned", fmt:"int"}, {key:"action_rate", label:"Action rate", fmt:"pct"},
+    {key:"win_rate", label:"Win rate", fmt:"pct"}, {key:"oldest", label:"Oldest waiting", fmt:"days"},
+    {key:"na5", label:"Waiting 5+ days", fmt:"int"}
+  ], rows, {grouped:true, total:{...flat(P.team), name:"All salespeople", src:"All sources", _t:1}, csv:"after-qualification",
+    rowClass:r => r._k === "sub" ? "sub" : "child"});
+
+  const ageRows = P.ageing.map(a => { const o = {name:a.name, total:a.total}; a.counts.forEach((v, i) => o["b" + i] = v); return o; });
+  const ageTot = {name:"Team", total:ageRows.reduce((x, r) => x + r.total, 0)};
+  P.age_buckets.forEach((_, i) => ageTot["b" + i] = ageRows.reduce((x, r) => x + r["b" + i], 0));
+  table("#t-age", [{key:"name", label:"Salesperson", t:1, html:r => `<b>${esc(r.name)}</b>`},
+    ...P.age_buckets.map((b, i) => ({key:"b" + i, label:b, fmt:"int", cls:r => i >= 2 && r["b" + i] && r.name !== "Team" ? "bad heat" : ""})),
+    {key:"total", label:"Total no action", fmt:"int"}], ageRows, {total:ageTot, csv:"no-action-ageing"});
+
+  const ct = P.customer_types;
+  table("#t-ctype", [{key:"type", label:"Customer type", t:1},
+    {key:"total", label:"Qualified", fmt:"int"}, {key:"no_action", label:"No action", fmt:"int"},
+    {key:"actioned", label:"Actioned", fmt:"int"}, {key:"action_rate", label:"Action rate", fmt:"pct"},
+    {key:"qty", label:"Purchase qty", fmt:"int"}, {key:"avg_qty", label:"Avg qty per lead", fmt:"int", html:r => r.avg_qty ? r.avg_qty.toFixed(1) : "–"}],
+    ct, {csv:"customer-types"});
+
+  table("#t-act", [
+    {key:"salesperson", label:"Salesperson", t:1}, {key:"customer", label:"Customer", t:1, wrap:1},
+    {key:"stage", label:"Stage", t:1, html:r => tag(r.stage)}, {key:"source", label:"Source", t:1},
+    {key:"id", label:"Record id", t:1}, {key:"customer_type", label:"Customer type", t:1},
+    {key:"qty", label:"Qty", fmt:"int"}, {key:"qualified_on", label:"Qualified on", fmt:"date"},
+    {key:"contact", label:"Contact", t:1, html:r => telLink(r.contact)}
+  ], s.actioned, {csv:"actioned-leads"});
+}
+
+let followTable;
+function renderFollow(s){
+  $("#c-follow").textContent = s.followup.length || "";
+  const sps = [...new Set(s.followup.map(r => r.salesperson))].sort();
+  const srcs = [...new Set(s.followup.map(r => r.source))].sort();
+  $("#f-sp").innerHTML = `<option value="">Everyone</option>` + sps.map(x => `<option>${esc(x)}</option>`).join("");
+  $("#f-src").innerHTML = `<option value="">All sources</option>` + srcs.map(x => `<option>${esc(x)}</option>`).join("");
+  const counts = {Critical:0, High:0, Normal:0}; s.followup.forEach(r => counts[r.priority]++);
+  $("#f-pri").innerHTML = Object.keys(counts).map(p => `<button type="button" class="chip" aria-pressed="false" data-p="${p}">${p}<b>${counts[p]}</b></button>`).join("");
+  state.follow = {q:"", sp:"", src:"", pri:new Set()};
+  $("#f-q").value = "";
+  followTable = table("#t-follow", followCols(), s.followup, {tall:true});
+  applyFollow();
+  $("#b-un").hidden = !s.unassigned.length;
+  if (s.unassigned.length) table("#t-un", [
+    {key:"source", label:"Source", t:1}, {key:"id", label:"Lead id", t:1}, {key:"customer", label:"Customer", t:1, wrap:1},
+    {key:"phone", label:"Phone", t:1, html:r => telLink(r.phone)}, {key:"lead_date", label:"Received", t:1, html:r => esc(r.lead_date ? F.date(r.lead_date) + r.lead_date.slice(10) : "–")},
+    {key:"status", label:"Status", t:1}], s.unassigned, {csv:"unassigned-leads", tall:true});
+}
+function followCols(){
+  const P = {Critical:"crit", High:"high", Normal:"norm"};
+  return [
+    {key:"priority", label:"Priority", t:1, html:r => tag(r.priority, P[r.priority]), csv:r => r.priority},
+    {key:"days", label:"Waiting", fmt:"days"},
+    {key:"salesperson", label:"Salesperson", t:1},
+    {key:"customer", label:"Customer", t:1, wrap:1},
+    {key:"contact", label:"Contact", t:1, html:r => telLink(r.contact)},
+    {key:"source", label:"Source", t:1}, {key:"id", label:"Record id", t:1},
+    {key:"customer_type", label:"Customer type", t:1}, {key:"qty", label:"Qty", fmt:"int"},
+    {key:"qualified_on", label:"Qualified on", fmt:"date"},
+    {key:"next_step", label:"Next step", t:1, wrap:1}
+  ];
+}
+function filteredFollow(){
+  const f = state.follow, q = f.q.trim().toLowerCase();
+  return (state.summary?.followup || []).filter(r =>
+    (!f.sp || r.salesperson === f.sp) && (!f.src || r.source === f.src) && (!f.pri.size || f.pri.has(r.priority)) &&
+    (!q || [r.customer, r.contact, r.id, r.salesperson].some(v => String(v || "").toLowerCase().includes(q))));
+}
+function applyFollow(){
+  const rows = filteredFollow(); followTable && followTable.set(rows);
+  $("#f-count").textContent = `${rows.length} of ${state.summary.followup.length} leads`;
+}
+$("#f-q").addEventListener("input", e => { state.follow.q = e.target.value; applyFollow(); });
+$("#f-sp").addEventListener("change", e => { state.follow.sp = e.target.value; applyFollow(); });
+$("#f-src").addEventListener("change", e => { state.follow.src = e.target.value; applyFollow(); });
+$("#f-pri").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return;
+  const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on));
+  on ? state.follow.pri.add(b.dataset.p) : state.follow.pri.delete(b.dataset.p); applyFollow(); });
+$("#csv-follow").addEventListener("click", () => downloadCSV("follow-up-list", followCols(), filteredFollow()));
+
+function renderFindingList(host, list){
+  $(host).innerHTML = list.map(it => `<article class="card finding ${esc(it.severity)}"><span class="sev" aria-hidden="true"></span>
+    <div><div class="area">${esc(it.area)}<span class="sr">, ${esc(it.severity)} priority</span></div>${esc(it.finding)}</div>
+    <div class="act"><b>Next step</b>${esc(it.action)}</div><div class="own">${esc(it.owner)}</div></article>`).join("") ||
+    `<p class="faint">No findings for this data.</p>`;
+}
+function renderFindings(s){
+  $("#c-find").textContent = s.insights.length || "";
+  const areas = [...new Set(s.insights.map(i => i.area))];
+  $("#f-area").innerHTML = [`<button type="button" class="chip" aria-pressed="true" data-a="">All</button>`]
+    .concat(areas.map(a => `<button type="button" class="chip" aria-pressed="false" data-a="${esc(a)}">${esc(a)}</button>`)).join("");
+  const draw = () => renderFindingList("#findings", s.insights.filter(i => !state.area || i.area === state.area));
+  state.area = ""; draw();
+  $("#f-area").onclick = e => { const b = e.target.closest(".chip"); if (!b) return;
+    state.area = b.dataset.a; $$(".chip", $("#f-area")).forEach(c => c.setAttribute("aria-pressed", String(c === b))); draw(); };
+}
+function renderChecks(s){
+  const issues = s.quality.filter(q => q.level === "issue").length;
+  $("#c-check").textContent = issues || "";
+  table("#t-files", [{key:"label", label:"Recognised as", t:1, html:r => `<b>${esc(r.label)}</b>`}, {key:"name", label:"File", t:1, wrap:1}, {key:"rows", label:"Rows", fmt:"int0"}],
+    s.meta.files, {sortable:false});
+  const ICON = {ok:"i-check", issue:"i-warn", note:"i-info"};
+  $("#checks").innerHTML = s.quality.map(q => `<div class="card check ${q.level}"><svg><use href="#${ICON[q.level] || "i-info"}"/></svg><div>${esc(q.text)}</div></div>`).join("");
+}
+
+/* ---------------------------------------------------------------- charts */
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function renderCharts(s){
+  if (!window.Chart) return;
+  Object.values(state.charts).forEach(c => c.destroy()); state.charts = {};
+  const ink2 = css("--ink-2"), line = css("--line");
+  Chart.defaults.font.family = css("--ui"); Chart.defaults.font.size = 12; Chart.defaults.color = ink2;
+  Chart.defaults.plugins.legend.labels.boxWidth = 12; Chart.defaults.plugins.legend.labels.boxHeight = 12;
+  Chart.defaults.maintainAspectRatio = false;
+  const SRC = {Meta:css("--forest"), IndiaMART:css("--oak"), JustDial:css("--prog")};
+  const srcColor = (n, i) => SRC[n] || [css("--q"), css("--cnp"), css("--nq")][i % 3];
+  const grid = {color:line, drawTicks:false}, noGrid = {display:false};
+  const pctAxis = {grid, border:{display:false}, ticks:{callback:v => Math.round(v*100) + "%"}, beginAtZero:true};
+  const intAxis = {grid, border:{display:false}, beginAtZero:true, ticks:{precision:0}};
+  const mk = (id, cfg) => { const el = document.getElementById(id); if (el) state.charts[id] = new Chart(el, cfg); };
+  const people = s.scorecard.rows.filter(r => r.name !== "Unassigned");
+
+  const T = s.trend;
+  mk("ch-trend", {type:"bar", data:{labels:T.dates.map(F.date), datasets:[
+      ...T.series.map((x, i) => ({label:x.source, data:x.values, backgroundColor:srcColor(x.source, i), stack:"s", borderRadius:3, order:2})),
+      {label:"Qualified", type:"line", data:T.qualified, borderColor:css("--ink"), backgroundColor:css("--ink"), pointRadius:3, tension:.3, order:1}]},
+    options:{scales:{x:{stacked:true, grid:noGrid}, y:{...intAxis, stacked:true}}, plugins:{legend:{position:"bottom"}}, interaction:{mode:"index", intersect:false}}});
+
+  mk("ch-conv", {type:"bar", data:{labels:people.map(r => r.name), datasets:[
+      {label:"Lead → qualified", data:people.map(r => r.conv), backgroundColor:css("--forest"), borderRadius:4},
+      {label:"Conversion on worked leads", data:people.map(r => r.conv_worked), backgroundColor:css("--oak"), borderRadius:4}]},
+    options:{scales:{x:{grid:noGrid}, y:pctAxis}, plugins:{legend:{position:"bottom"}, tooltip:{callbacks:{label:c => c.dataset.label + ": " + F.pct(c.raw)}}}}});
+
+  const st = [["qualified", "Qualified", "--q"], ["not_qualified", "Not qualified", "--nq"], ["call_not_pick", "Call not pick", "--cnp"], ["pending", "Not worked", "--pend"]];
+  const all = s.scorecard.rows;
+  mk("ch-status", {type:"bar", data:{labels:all.map(r => r.name), datasets:st.map(([k, l, c]) => ({label:l, data:all.map(r => r[k]), backgroundColor:css(c)}))},
+    options:{indexAxis:"y", scales:{x:{...intAxis, stacked:true}, y:{stacked:true, grid:noGrid}}, plugins:{legend:{position:"bottom"}}}});
+
+  const sr = s.sources.rows.filter(r => r.leads);
+  mk("ch-share", {type:"doughnut", data:{labels:sr.map(r => r.source), datasets:[{data:sr.map(r => r.leads), backgroundColor:sr.map((r, i) => srcColor(r.source, i)), borderColor:css("--surface"), borderWidth:2}]},
+    options:{cutout:"62%", plugins:{legend:{position:"right"}, tooltip:{callbacks:{label:c => `${c.label}: ${nf.format(c.raw)} (${F.pct(sr[c.dataIndex].share)})`}}}}});
+  mk("ch-srcconv", {type:"bar", data:{labels:sr.map(r => r.source), datasets:[
+      {label:"Lead → qualified", data:sr.map(r => r.conv), backgroundColor:css("--forest"), borderRadius:4},
+      {label:"Conversion on worked leads", data:sr.map(r => r.conv_worked), backgroundColor:css("--oak"), borderRadius:4}]},
+    options:{scales:{x:{grid:noGrid}, y:pctAxis}, plugins:{legend:{position:"bottom"}, tooltip:{callbacks:{label:c => c.dataset.label + ": " + F.pct(c.raw)}}}}});
+
+  if (s.meta.has_pipeline){
+    const pp = s.pipeline.people;
+    mk("ch-pipe", {type:"bar", data:{labels:pp.map(p => p.name), datasets:[
+        {label:"No action", data:pp.map(p => p.total.no_action), backgroundColor:css("--pend")},
+        {label:"Actioned", data:pp.map(p => p.total.actioned), backgroundColor:css("--q")}]},
+      options:{scales:{x:{stacked:true, grid:noGrid}, y:{...intAxis, stacked:true}}, plugins:{legend:{position:"bottom"}}}});
+    const ag = s.pipeline.ageing, shades = ["--q", "--prog", "--cnp", "--nq", "--lost"];
+    mk("ch-age", {type:"bar", data:{labels:ag.map(a => a.name), datasets:s.pipeline.age_buckets.map((b, i) => ({label:b, data:ag.map(a => a.counts[i]), backgroundColor:css(shades[i])}))},
+      options:{scales:{x:{stacked:true, grid:noGrid}, y:{...intAxis, stacked:true}}, plugins:{legend:{position:"bottom"}}}});
+  }
+}
+
+/* ---------------------------------------------------------------- actions */
+$("#dl-xlsx").addEventListener("click", () => {
+  if (!state.xlsx) return;
+  const d = new Date((state.summary.meta.asof || "") + "T00:00:00");
+  const tag = isNaN(d) ? "" : "_" + d.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year:"numeric"}).replace(/ /g, "_");
+  saveBlob(new Blob([state.xlsx], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), `OakCraft_Master_Lead_Report${tag}.xlsx`);
+  toast("Excel report downloaded.");
+});
+$("#do-print").addEventListener("click", () => { Object.values(state.charts).forEach(c => c.resize()); window.print(); });
+$("#new-report").addEventListener("click", () => {
+  closePerson();
+  document.body.classList.remove("has-report"); state.summary = null; state.xlsx = null; state.files = [];
+  Object.values(state.charts).forEach(c => c.destroy()); state.charts = {};
+  refreshBench(); renderHistory(); window.scrollTo(0, 0);
+});
+window.addEventListener("beforeprint", () => $$(".panel").forEach(p => p.classList.add("on")));
+window.addEventListener("afterprint", () => go(state.panel));
+
+/* ---------------------------------------------------------------- salesperson drill-down */
+let lastFocus = null;
+function firstName(n){ return String(n || "").split(" ")[0]; }
+function waMessage(name, rows){
+  const crit = rows.filter(r => r.priority === "Critical").length;
+  const lines = rows.slice(0, 40).map((r, i) =>
+    `${i + 1}. ${r.customer || "–"} – ${r.contact || "no number"} – ${r.days ?? "?"} din – ${r.next_step}`);
+  return [`Hi ${firstName(name)}, aapke qualified leads jin par abhi tak koi action nahi hua: ${rows.length}` + (crit ? ` (${crit} critical, 5+ din purane)` : "") + ".",
+    "", ...lines, rows.length > 40 ? `…aur ${rows.length - 40} leads (poori list CSV me).` : "",
+    "", "Har call ke baad CRM me status update karein (Quotation Sent / Won / Lost)."].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
+}
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); return true; }
+  catch(e){
+    const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch(_){}
+    ta.remove(); return ok;
+  }
+}
+function openPerson(name){
+  const s = state.summary; if (!s) return;
+  const sc = s.scorecard.rows.find(r => r.name === name); if (!sc) return;
+  const team = s.scorecard.team;
+  const ps = s.person_source.find(p => p.name === name);
+  const pp = s.pipeline.people.find(p => p.name === name);
+  const fl = s.followup.filter(r => r.salesperson === name);
+  const act = s.actioned.filter(r => r.salesperson === name);
+  const crit = fl.filter(r => r.priority === "Critical").length;
+  $("#dr-name").textContent = name;
+  $("#dr-sub").textContent = `${nf.format(sc.leads)} leads assigned · ${nf.format(sc.pipe)} qualified leads in the pipeline` + (crit ? ` · ${crit} waiting 5+ days` : "");
+  const cmp = [["Leads worked", "worked_pct"], ["Lead → qualified", "conv"], ["Conversion on worked leads", "conv_worked"], ["Action rate after qualification", "action_rate"], ["Win rate", "win_rate"]];
+  const vs = cmp.filter(([, k]) => team[k] != null).map(([l, k]) => {
+    const cls = sc[k] > team[k] + 1e-9 ? "up" : sc[k] < team[k] - 1e-9 ? "down" : "";
+    return `<div><span>${esc(l)}</span><span><b class="${cls}">${F.pct(sc[k])}</b></span><span class="faint">${F.pct(team[k])}</span></div>`;
+  }).join("");
+  const body = $("#dr-body");
+  body.innerHTML = `
+    <section><div class="metrics">
+      ${metric(nf.format(sc.leads), "Leads")}${metric(nf.format(sc.qualified), "Qualified", F.pct(sc.conv) + " of leads")}${metric(F.pct(sc.conv_worked), "Conv. on worked")}
+      ${metric(nf.format(sc.pending), "Not worked yet", "", sc.pending > 0)}${metric(nf.format(sc.call_not_pick), "Call not pick")}${metric(nf.format(sc.pipe), "In pipeline")}
+      ${metric(nf.format(sc.no_action), "No action yet", "", sc.no_action > 0)}${metric(nf.format(sc.won), "Won")}${metric(nf.format(sc.na5), "Waiting 5+ days", "", sc.na5 > 0)}
+    </div></section>
+    <section><h3>Against the team</h3><div class="vs"><div class="head"><span></span><span>${esc(firstName(name))}</span><span>Team</span></div>${vs}</div></section>
+    ${ps ? `<section><h3>Leads by source</h3><div id="dr-src"></div></section>` : ""}
+    ${pp ? `<section><h3>After qualification by source</h3><div id="dr-pipe"></div></section>` : ""}
+    <section><h3><span>Follow-ups (${fl.length})</span><span class="actions">
+        <button class="btn small" type="button" id="dr-wa" ${fl.length ? "" : "disabled"}><svg><use href="#i-copy"/></svg>Copy WhatsApp message</button>
+        <button class="btn small" type="button" id="dr-csv" ${fl.length ? "" : "disabled"}><svg><use href="#i-csv"/></svg>Download list</button></span></h3>
+      <div id="dr-follow"></div></section>
+    ${act.length ? `<section><h3>Moved after qualification (${act.length})</h3><div id="dr-act"></div></section>` : ""}`;
+  if (ps) table("#dr-src", [{key:"source", label:"Source", t:1}, {key:"leads", label:"Leads", fmt:"int"}, {key:"qualified", label:"Qualified", fmt:"int"},
+    {key:"not_qualified", label:"Not qualified", fmt:"int"}, {key:"pending", label:"Not worked", fmt:"int"}, {key:"conv", label:"Lead → qualified", fmt:"pct"},
+    {key:"conv_worked", label:"Conv. on worked", fmt:"pct"}], ps.sources, {});
+  if (pp){
+    const rows = pp.sources.map(c => ({source:c.source, total:c.total, no_action:c.no_action, actioned:c.actioned, won:c.won, lost:c.lost, action_rate:c.action_rate, oldest:c.oldest}));
+    table("#dr-pipe", [{key:"source", label:"Source", t:1}, {key:"total", label:"Qualified", fmt:"int"}, {key:"no_action", label:"No action", fmt:"int"},
+      {key:"actioned", label:"Actioned", fmt:"int"}, {key:"won", label:"Won", fmt:"int"}, {key:"action_rate", label:"Action rate", fmt:"pct"}, {key:"oldest", label:"Oldest waiting", fmt:"days"}], rows, {});
+  }
+  const P = {Critical:"crit", High:"high", Normal:"norm"};
+  const fcols = [{key:"priority", label:"Priority", t:1, html:r => tag(r.priority, P[r.priority]), csv:r => r.priority}, {key:"days", label:"Waiting", fmt:"days"},
+    {key:"customer", label:"Customer", t:1, wrap:1}, {key:"contact", label:"Contact", t:1, html:r => telLink(r.contact)}, {key:"qty", label:"Qty", fmt:"int"},
+    {key:"source", label:"Source", t:1}, {key:"id", label:"Record id", t:1}, {key:"next_step", label:"Next step", t:1, wrap:1}];
+  table("#dr-follow", fcols, fl, {tall:true});
+  if (act.length) table("#dr-act", [{key:"customer", label:"Customer", t:1, wrap:1}, {key:"stage", label:"Stage", t:1, html:r => tag(r.stage)},
+    {key:"source", label:"Source", t:1}, {key:"qty", label:"Qty", fmt:"int"}, {key:"qualified_on", label:"Qualified on", fmt:"date"}], act, {});
+  $("#dr-wa").onclick = async () => toast(await copyText(waMessage(name, fl)) ? "Message copied. Paste it in WhatsApp." : "Copy was blocked by the browser.", false);
+  $("#dr-csv").onclick = () => downloadCSV(`follow-ups-${name.toLowerCase().replace(/\s+/g, "-")}`, fcols, fl);
+  lastFocus = document.activeElement;
+  $("#scrim").classList.add("on"); const d = $("#drawer"); d.classList.add("on"); body.scrollTop = 0;
+  setTimeout(() => $("#dr-close").focus(), 50);
+}
+function closePerson(){
+  $("#scrim").classList.remove("on"); $("#drawer").classList.remove("on");
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-person]"); if (b) openPerson(b.dataset.person); });
+$("#dr-close").addEventListener("click", closePerson);
+$("#scrim").addEventListener("click", closePerson);
+document.addEventListener("keydown", e => {
+  if (!$("#drawer").classList.contains("on")) return;
+  if (e.key === "Escape") closePerson();
+  if (e.key === "Tab"){ /* keep focus inside the drawer */
+    const f = $$('button:not([disabled]), a[href], input, select, [tabindex]:not([tabindex="-1"])', $("#drawer"));
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]){ e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]){ e.preventDefault(); f[0].focus(); }
+  }
+});
+
+/* ---------------------------------------------------------------- share snapshot (standalone HTML) */
+function snapTable(cols, rows, total){
+  const td = (c, r, tagName="td") => {
+    const v = r[c.key]; const txt = c.raw ? c.raw(r) : esc((F[c.fmt || "text"] || F.text)(v));
+    return `<${tagName} class="${c.t ? "t" : ""}">${txt}</${tagName}>`;
+  };
+  return `<table><thead><tr>${cols.map(c => `<th class="${c.t ? "t" : ""}">${esc(c.label)}</th>`).join("")}</tr></thead><tbody>${
+    rows.map(r => `<tr class="${r._k || ""}">${cols.map(c => td(c, r)).join("")}</tr>`).join("")}</tbody>${
+    total ? `<tfoot><tr>${cols.map(c => td(c, total)).join("")}</tr></tfoot>` : ""}</table>`;
+}
+function buildSnapshot(s){
+  const k = s.kpi, m = s.meta, team = s.scorecard.team;
+  const period = m.lead_from ? `${F.dateY(m.lead_from)} – ${F.dateY(m.lead_to)}` : "Pipeline only";
+  const head = $("#headline").textContent;
+  const kp = (v, l) => `<div class="kp"><b>${v}</b><span>${esc(l)}</span></div>`;
+  const leadK = m.has_leads ? [kp(nf.format(k.leads), "Leads received"), kp(nf.format(k.qualified), "Qualified"), kp(F.pct(k.conv), "Lead → qualified"),
+    kp(F.pct(k.conv_worked), "Conv. on worked leads"), kp(nf.format(k.pending), "Not worked yet"), kp(nf.format(k.unassigned), "Unassigned")].join("") : "";
+  const pipeK = m.has_pipeline ? [kp(nf.format(k.pipe_total), "Qualified in pipeline"), kp(nf.format(k.no_action), "No action yet"), kp(F.pct(k.action_rate), "Action rate"),
+    kp(nf.format(k.won), "Won"), kp(nf.format(k.lost), "Lost"), kp(nf.format(k.na5), "Waiting 5+ days")].join("") : "";
+  const score = snapTable([{key:"name", label:"Salesperson", t:1}, {key:"leads", label:"Leads", fmt:"int"}, {key:"qualified", label:"Qualified", fmt:"int"},
+    {key:"conv", label:"Lead → qualified", fmt:"pct"}, {key:"conv_worked", label:"Conv. on worked", fmt:"pct"}, {key:"pending", label:"Not worked", fmt:"int"},
+    {key:"pipe", label:"In pipeline", fmt:"int"}, {key:"no_action", label:"No action", fmt:"int"}, {key:"action_rate", label:"Action rate", fmt:"pct"},
+    {key:"won", label:"Won", fmt:"int"}, {key:"na5", label:"Waiting 5+ days", fmt:"int"}], s.scorecard.rows, {...team, name:"Team"});
+  const psRows = []; s.person_source.forEach(p => { psRows.push({...p.total, name:p.name, src:"All sources", _k:"sub"}); p.sources.forEach(c => psRows.push({...c, name:"\u00a0", src:c.source})); });
+  const ps = snapTable([{key:"name", label:"Salesperson", t:1}, {key:"src", label:"Source", t:1}, {key:"leads", label:"Leads", fmt:"int"},
+    {key:"qualified", label:"Qualified", fmt:"int"}, {key:"not_qualified", label:"Not qualified", fmt:"int"}, {key:"call_not_pick", label:"Call not pick", fmt:"int"},
+    {key:"pending", label:"Not worked", fmt:"int"}, {key:"conv", label:"Lead → qualified", fmt:"pct"}, {key:"conv_worked", label:"Conv. on worked", fmt:"pct"}], psRows);
+  const src = snapTable([{key:"source", label:"Source", t:1}, {key:"leads", label:"Leads", fmt:"int"}, {key:"share", label:"Share", fmt:"pct"},
+    {key:"qualified", label:"Qualified", fmt:"int"}, {key:"conv", label:"Lead → qualified", fmt:"pct"}, {key:"conv_worked", label:"Conv. on worked", fmt:"pct"},
+    {key:"pipe", label:"In pipeline", fmt:"int"}, {key:"actioned", label:"Actioned", fmt:"int"}, {key:"won", label:"Won", fmt:"int"}], s.sources.rows);
+  let pipe = "";
+  if (m.has_pipeline){
+    const P = s.pipeline, rows = P.people.map(p => { const o = {name:p.name, ...p.total}; P.stages.forEach(st => o["st_" + st] = p.total.stages[st]); return o; });
+    const tot = {name:"Team", ...P.team}; P.stages.forEach(st => tot["st_" + st] = P.team.stages[st]);
+    pipe = snapTable([{key:"name", label:"Salesperson", t:1}, {key:"total", label:"Qualified", fmt:"int"},
+      ...P.stages.map(st => ({key:"st_" + st, label:st, fmt:"int"})), {key:"action_rate", label:"Action rate", fmt:"pct"}, {key:"oldest", label:"Oldest waiting", fmt:"days"}], rows, tot);
+  }
+  const fl = s.followup.filter(r => r.priority !== "Normal");
+  const follow = snapTable([{key:"priority", label:"Priority", t:1}, {key:"days", label:"Waiting", fmt:"days"}, {key:"salesperson", label:"Salesperson", t:1},
+    {key:"customer", label:"Customer", t:1}, {key:"contact", label:"Contact", t:1}, {key:"source", label:"Source", t:1}, {key:"qty", label:"Qty", fmt:"int"},
+    {key:"next_step", label:"Next step", t:1}], fl);
+  const finds = s.insights.map(i => `<li class="${esc(i.severity)}"><p>${esc(i.finding)}</p><p class="act"><b>Next step (${esc(i.owner)}):</b> ${esc(i.action)}</p></li>`).join("");
+  const issues = s.quality.filter(q => q.level === "issue").map(q => `<li>${esc(q.text)}</li>`).join("");
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OakCraft lead report · ${esc(period)}</title><style>
+body{margin:0;background:#F6F7F4;color:#1D2421;font:14px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:1080px;margin:0 auto;padding:32px 20px 60px}
+h1{font-size:28px;margin:0 0 4px;letter-spacing:-.01em} h2{font-size:18px;margin:36px 0 10px;padding-top:14px;border-top:2px solid #234B3E}
+.sub{color:#4E5A55;margin:0 0 18px}.lead{font-size:17px;margin:0 0 20px;max-width:70ch}
+.kps{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px}.kp{background:#fff;border:1px solid #DCE1DC;border-radius:8px;padding:10px 12px}
+.kp b{display:block;font-size:22px}.kp span{font-size:12px;color:#4E5A55}.grp{font-size:12.5px;font-weight:600;color:#4E5A55;margin:14px 0 6px}
+.wrap{overflow:auto;background:#fff;border:1px solid #DCE1DC;border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:7px 10px;border-bottom:1px solid #E6EAE6;text-align:right;white-space:nowrap}
+th{background:#EEF1EC;color:#4E5A55;font-weight:600}.t{text-align:left}tr.sub td{background:#F3F6F2;font-weight:600}
+tfoot td{background:#234B3E;color:#fff;font-weight:600}ul{padding-left:18px}
+.finds{list-style:none;padding:0;display:grid;gap:8px}.finds li{background:#fff;border:1px solid #DCE1DC;border-left:4px solid #7D8A93;border-radius:6px;padding:10px 14px}
+.finds li.high{border-left-color:#B5473A}.finds li.medium{border-left-color:#C98A1E}.finds li.low{border-left-color:#2E8B57}.finds p{margin:0}.finds .act{color:#4E5A55;margin-top:4px}
+footer{margin-top:40px;color:#7A857F;font-size:12px}@media(max-width:720px){.kps{grid-template-columns:repeat(2,1fr)}}
+@media print{body{background:#fff}h2{break-after:avoid}.wrap{border:0}}
+</style></head><body><main>
+<h1>OakCraft lead &amp; pipeline report</h1><p class="sub">Leads ${esc(period)} · report date ${esc(F.dateY(m.asof))}</p>
+<p class="lead">${esc(head)}</p>
+${leadK ? `<div class="grp">Lead handling</div><div class="kps">${leadK}</div>` : ""}${pipeK ? `<div class="grp">After qualification</div><div class="kps">${pipeK}</div>` : ""}
+<h2>Salesperson scorecard</h2><div class="wrap">${score}</div>
+${m.has_leads ? `<h2>Salesperson × source</h2><div class="wrap">${ps}</div><h2>Sources</h2><div class="wrap">${src}</div>` : ""}
+${pipe ? `<h2>After qualification</h2><div class="wrap">${pipe}</div>` : ""}
+<h2>Findings and next steps</h2><ul class="finds">${finds}</ul>
+${fl.length ? `<h2>Follow-ups waiting 3+ days (${fl.length})</h2><div class="wrap">${follow}</div>` : ""}
+${issues ? `<h2>Data issues</h2><ul>${issues}</ul>` : ""}
+<footer>Generated by OakCraft Report Studio on ${esc(new Date().toLocaleString("en-GB"))}. Full detail is in the Excel report.</footer>
+</main></body></html>`;
+}
+$("#share").addEventListener("click", () => {
+  if (!state.summary) return;
+  const d = new Date((state.summary.meta.asof || "") + "T00:00:00");
+  const tagStr = isNaN(d) ? "" : "_" + d.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year:"numeric"}).replace(/ /g, "_");
+  saveBlob(new Blob([buildSnapshot(state.summary)], {type:"text/html;charset=utf-8"}), `OakCraft_Lead_Report_Snapshot${tagStr}.html`);
+  toast("Snapshot saved. It opens in any browser and can be attached to an email.");
+});
+
+refreshBench(); renderHistory(); boot();
+</script>
+</body>
+</html>

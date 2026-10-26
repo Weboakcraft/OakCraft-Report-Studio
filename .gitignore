@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+_site/
+.venv/
+*.xlsx
+.DS_Store
